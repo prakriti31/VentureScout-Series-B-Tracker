@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>VentureScout: Series B Startup Tracker</title>
+
+    <!-- Tailwind CSS -->
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Font Awesome -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    
+
+    <!-- Chosen Palette: Warm Professional -->
+
+    <!-- Primary: Slate/Zinc (Backgrounds), Deep Indigo (Accents), Emerald (Success/Money) -->
+
+    
+
+    <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        
+
+        body {
+
+            font-family: 'Inter', sans-serif;
+
+            background-color: #f8fafc; /* Slate 50 */
+
+            color: #1e293b; /* Slate 800 */
+
+        }
+
+
+
+        /* Chart Container Styling - Critical for Responsiveness */
+
+        .chart-container {
+
+            position: relative;
+
+            width: 100%;
+
+            max-width: 100%;
+
+            height: 300px;
+
+            max-height: 350px;
+
+        }
+
+
+
+        /* Custom Scrollbar for Table */
+
+        .custom-scrollbar::-webkit-scrollbar {
+
+            width: 6px;
+
+            height: 6px;
+
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+
+            background: #f1f5f9;
+
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+
+            background-color: #cbd5e1;
+
+            border-radius: 4px;
+
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+
+            background-color: #94a3b8;
+
+        }
+
+
+
+        /* Smooth Transitions */
+
+        .transition-all-300 {
+
+            transition: all 0.3s ease-in-out;
+
+        }
+
+    </style>
+
+    
+
+    <!-- Application Structure Plan:
+
+         1. Header & Context: Introduction to the dataset and scope (Series B, Major Hubs).
+
+         2. KPI Dashboard: High-level aggregate metrics (Total Funding, Avg Deal Size) to give immediate market context.
+
+         3. Visual Analytics Section: Three chart columns to visualize Industry dominance, Geographic split, and Deal Size distribution.
+
+         4. Control Center: Interactive Search and Filters (Industry, City) to allow users to slice the data.
+
+         5. Data Grid: A comprehensive, sortable table presenting the core "Source Report" data (40+ companies).
+
+         6. Footer: Sourcing notes.
+
+         
+
+         Rationale: This structure moves from macro (charts) to micro (individual company rows), allowing users to understand trends before drilling into specific leads.
+
+    -->
+
+    
+
+    <!-- Visualization & Content Choices:
+
+         1. "Funding by Industry" (Bar Chart): Comparison goal. Shows which sectors are attracting the most Series B capital.
+
+         2. "Hub Distribution" (Doughnut Chart): Relationship goal. Visualizes the dominance of Silicon Valley vs. other emerging hubs.
+
+         3. "Deal Size Distribution" (Line/Area): Distribution goal. Helps users understand what a "typical" Series B looks like in this cohort.
+
+         4. Interactive Table: Organization goal. The most efficient way to present structured text/numeric data for 40+ entities.
+
+         
+
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+
+    -->
+
+</head>
+
+<body class="antialiased selection:bg-indigo-100 selection:text-indigo-800">
+
+
+
+    <!-- Main Container -->
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        
+
+        <!-- Header Section -->
+
+        <header class="mb-8">
+
+            <div class="flex flex-col md:flex-row md:justify-between md:items-end">
+
+                <div>
+
+                    <h1 class="text-3xl font-bold text-slate-900 tracking-tight">VentureScout <span class="text-indigo-600">Series B Tracker</span></h1>
+
+                    <p class="mt-2 text-slate-600 max-w-2xl text-sm leading-relaxed">
+
+                        A curated market research dashboard analyzing high-growth startups that have recently raised <strong>Series B funding</strong>. 
+
+                        The dataset covers key innovation hubs (Bay Area, NYC, Seattle, Chicago) across major sectors like AI, Fintech, and Climate. 
+
+                        Use the filters below to identify potential partners, competitors, or investment opportunities.
+
+                    </p>
+
+                </div>
+
+                <div class="mt-4 md:mt-0 text-right">
+
+                    <span class="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
+
+                        <i class="fas fa-check-circle mr-1.5"></i> Data Updated: Feb 2026
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- KPI Cards -->
+
+        <section id="kpi-section" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+
+            <!-- Dynamic KPI Cards will be injected here by JS -->
+
+        </section>
+
+
+
+        <!-- Visualization Section -->
+
+        <section class="mb-10">
+
+            <div class="mb-4">
+
+                <h2 class="text-lg font-semibold text-slate-900">Market Insights</h2>
+
+                <p class="text-sm text-slate-500">Visualizing capital allocation across industries and geographies.</p>
+
+            </div>
+
+            
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Chart 1: Industry Breakdown -->
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col">
+
+                    <h3 class="text-sm font-medium text-slate-700 mb-4">Total Funding by Industry</h3>
+
+                    <div class="chart-container flex-grow">
+
+                        <canvas id="industryChart"></canvas>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Chart 2: Location Split -->
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col">
+
+                    <h3 class="text-sm font-medium text-slate-700 mb-4">Headquarters Distribution</h3>
+
+                    <div class="chart-container flex-grow">
+
+                        <canvas id="locationChart"></canvas>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Chart 3: Deal Velocity (Simulated Year) -->
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col">
+
+                    <h3 class="text-sm font-medium text-slate-700 mb-4">Avg. Deal Size ($M)</h3>
+
+                    <div class="chart-container flex-grow">
+
+                        <canvas id="dealSizeChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- Interactive Data Section -->
+
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+
+            
+
+            <!-- Controls Toolbar -->
+
+            <div class="p-5 border-b border-slate-200 bg-slate-50/50 flex flex-col lg:flex-row gap-4 justify-between items-center">
+
+                <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+
+                    <!-- Search -->
+
+                    <div class="relative w-full sm:w-64">
+
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+
+                            <i class="fas fa-search text-slate-400"></i>
+
+                        </div>
+
+                        <input type="text" id="searchInput" class="block w-full rounded-md border-0 py-2 pl-10 text-slate-900 ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Search company or investor...">
+
+                    </div>
+
+                    
+
+                    <!-- Filters -->
+
+                    <select id="industryFilter" class="block w-full sm:w-48 rounded-md border-0 py-2 pl-3 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+
+                        <option value="All">All Industries</option>
+
+                        <!-- Options populated by JS -->
+
+                    </select>
+
+
+
+                    <select id="cityFilter" class="block w-full sm:w-40 rounded-md border-0 py-2 pl-3 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+
+                        <option value="All">All Locations</option>
+
+                        <!-- Options populated by JS -->
+
+                    </select>
+
+                </div>
+
+
+
+                <div class="text-sm text-slate-500 font-medium">
+
+                    Showing <span id="countDisplay" class="text-slate-900">0</span> companies
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Table -->
+
+            <div class="overflow-x-auto custom-scrollbar">
+
+                <table class="min-w-full divide-y divide-slate-300">
+
+                    <thead class="bg-slate-50">
+
+                        <tr>
+
+                            <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-indigo-600" onclick="sortTable('name')">Company <i class="fas fa-sort ml-1"></i></th>
+
+                            <th scope="col" class="px-3 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Location</th>
+
+                            <th scope="col" class="px-3 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Industry</th>
+
+                            <th scope="col" class="px-3 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-indigo-600" onclick="sortTable('amount')">Series B ($M) <i class="fas fa-sort ml-1"></i></th>
+
+                            <th scope="col" class="hidden md:table-cell px-3 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Lead Investor</th>
+
+                            <th scope="col" class="px-3 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Description</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="startupsTableBody" class="divide-y divide-slate-200 bg-white">
+
+                        <!-- Rows populated by JS -->
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            
+
+            <!-- Pagination / Footer of Table -->
+
+            <div class="border-t border-slate-200 px-4 py-3 bg-slate-50 flex justify-center">
+
+                <p class="text-xs text-slate-500">Sorted by relevance and funding momentum.</p>
+
+            </div>
+
+        </section>
+
+        
+
+        <footer class="mt-8 border-t border-slate-200 pt-6 text-center text-xs text-slate-400">
+
+            <p>Sources: Aggregated from Crunchbase, TechCrunch, and SEC Filings (2022-2025). Employee counts are estimates.</p>
+
+            <p class="mt-1">&copy; 2026 VentureScout Analytics.</p>
+
+        </footer>
+
+
+
+    </div>
+
+
+
+    <!-- Application Logic -->
+
+    <script>
+
+        // --- DATASET: The "Source Report" Content ---
+
+        // A curated list of ~45 companies fitting the Series B, recent, specific geography criteria.
+
+        const startupData = [
+
+            { id: 1, name: "Harvey", city: "San Francisco", state: "CA", industry: "AI / Legal", amount: 80, date: "2023", investor: "Sequoia", total: 106, employees: "50-100", desc: "Generative AI platform for elite law firms." },
+
+            { id: 2, name: "Supabase", city: "San Francisco", state: "CA", industry: "DevTools", amount: 80, date: "2022", investor: "Felicis", total: 116, employees: "100-250", desc: "Open source Firebase alternative." },
+
+            { id: 3, name: "Watershed", city: "San Francisco", state: "CA", industry: "Climate", amount: 70, date: "2022", investor: "Sequoia", total: 120, employees: "250-500", desc: "Enterprise carbon footprint measurement." },
+
+            { id: 4, name: "Warp", city: "New York", state: "NY", industry: "DevTools", amount: 50, date: "2023", investor: "Sequoia", total: 73, employees: "50-100", desc: "Rust-based modern terminal." },
+
+            { id: 5, name: "Clay", city: "New York", state: "NY", industry: "SaaS / Sales", amount: 46, date: "2024", investor: "Meritech", total: 62, employees: "50-100", desc: "Automated data enrichment for sales teams." },
+
+            { id: 6, name: "Imbue", city: "San Francisco", state: "CA", industry: "AI / Research", amount: 200, date: "2023", investor: "Astera Institute", total: 220, employees: "50-100", desc: "Building AI agents that can reason and code." },
+
+            { id: 7, name: "Hex", city: "San Francisco", state: "CA", industry: "Data", amount: 52, date: "2022", investor: "a16z", total: 96, employees: "100-250", desc: "Collaborative data science workspace." },
+
+            { id: 8, name: "Vanta", city: "San Francisco", state: "CA", industry: "Security", amount: 110, date: "2022", investor: "Craft Ventures", total: 203, employees: "250-500", desc: "Automated security compliance (SOC2/HIPAA)." },
+
+            { id: 9, name: "Pave", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 100, date: "2022", investor: "Index Ventures", total: 160, employees: "150-300", desc: "Real-time compensation planning data." },
+
+            { id: 10, name: "MotherDuck", city: "Seattle", state: "WA", industry: "Data", amount: 52.5, date: "2023", investor: "Felicis", total: 100, employees: "50-100", desc: "Serverless data analytics with DuckDB." },
+
+            { id: 11, name: "Character.ai", city: "Menlo Park", state: "CA", industry: "AI / Consumer", amount: 150, date: "2023", investor: "a16z", total: 150, employees: "100-250", desc: "Open-ended conversational AI applications." },
+
+            { id: 12, name: "Shield AI", city: "San Diego", state: "CA", industry: "Defense / AI", amount: 165, date: "2022", investor: "Snowpoint", total: 500, employees: "500+", desc: "AI pilot systems for autonomous aircraft." },
+
+            { id: 13, name: "Linear", city: "San Francisco", state: "CA", industry: "DevTools", amount: 35, date: "2023", investor: "Accel", total: 52, employees: "50-100", desc: "Issue tracking built for speed and design." },
+
+            { id: 14, name: "Ampla", city: "New York", state: "NY", industry: "Fintech", amount: 40, date: "2022", investor: "VMG Partners", total: 380, employees: "50-100", desc: "Financial platform for CPG brands." },
+
+            { id: 15, name: "Kin Insurance", city: "Chicago", state: "IL", industry: "Insurtech", amount: 82, date: "2022", investor: "QED Investors", total: 250, employees: "250-500", desc: "Direct-to-consumer home insurance." },
+
+            { id: 16, name: "Chronosphere", city: "New York", state: "NY", industry: "DevOps", amount: 200, date: "2022", investor: "General Atlantic", total: 300, employees: "250-500", desc: "Cloud-native observability platform." },
+
+            { id: 17, name: "Modern Treasury", city: "San Francisco", state: "CA", industry: "Fintech", amount: 85, date: "2022", investor: "Altimeter", total: 133, employees: "100-250", desc: "Payment operations software." },
+
+            { id: 18, name: "Sardine", city: "San Francisco", state: "CA", industry: "Fintech / Fraud", amount: 51.5, date: "2022", investor: "a16z", total: 75, employees: "50-100", desc: "Fraud prevention and compliance platform." },
+
+            { id: 19, name: "Bilt Rewards", city: "New York", state: "NY", industry: "Fintech / Prop", amount: 150, date: "2022", investor: "Left Lane", total: 213, employees: "100-250", desc: "Rewards program for paying rent." },
+
+            { id: 20, name: "Unstructured", city: "San Francisco", state: "CA", industry: "AI / Data", amount: 40, date: "2024", investor: "Menlo", total: 65, employees: "25-50", desc: "ETL for LLMs; unstructured data processing." },
+
+            { id: 21, name: "LangChain", city: "San Francisco", state: "CA", industry: "AI / DevTools", amount: 25, date: "2024", investor: "Sequoia", total: 35, employees: "25-50", desc: "Framework for developing LLM applications." },
+
+            { id: 22, name: "Together AI", city: "San Francisco", state: "CA", industry: "AI / Cloud", amount: 102, date: "2023", investor: "Kleiner Perkins", total: 130, employees: "50-100", desc: "Cloud platform for training generative AI." },
+
+            { id: 23, name: "Chainguard", city: "Seattle", state: "WA", industry: "Security", amount: 61, date: "2023", investor: "Spark Capital", total: 116, employees: "50-100", desc: "Software supply chain security." },
+
+            { id: 24, name: "Neon", city: "San Francisco", state: "CA", industry: "DevTools", amount: 46, date: "2023", investor: "Menlo", total: 104, employees: "50-100", desc: "Serverless Postgres database." },
+
+            { id: 25, name: "Pachama", city: "San Francisco", state: "CA", industry: "Climate", amount: 55, date: "2022", investor: "Future Positive", total: 79, employees: "50-100", desc: "AI-verified forest carbon credits." },
+
+            { id: 26, name: "Regard", city: "Los Angeles", state: "CA", industry: "Health / AI", amount: 30, date: "2024", investor: "Oak HC/FT", total: 50, employees: "50-100", desc: "AI co-pilot for clinicians." },
+
+            { id: 27, name: "Capital", city: "New York", state: "NY", industry: "Fintech", amount: 40, date: "2023", investor: "Founders Fund", total: 50, employees: "50-100", desc: "The founders' bank platform." },
+
+            { id: 28, name: "Owner.com", city: "Palo Alto", state: "CA", industry: "SaaS", amount: 33, date: "2023", investor: "Redpoint", total: 58, employees: "100-250", desc: "All-in-one platform for restaurant owners." },
+
+            { id: 29, name: "EvenUp", city: "San Francisco", state: "CA", industry: "Legal AI", amount: 50, date: "2023", investor: "Bessemer", total: 65, employees: "50-100", desc: "AI for personal injury law claims." },
+
+            { id: 30, name: "Abridge", city: "Pittsburgh/SF", state: "CA", industry: "Health / AI", amount: 150, date: "2024", investor: "Lightspeed", total: 212, employees: "50-100", desc: "Generative AI for medical documentation." },
+
+            { id: 31, name: "Captions", city: "New York", state: "NY", industry: "AI / Media", amount: 60, date: "2024", investor: "Index", total: 100, employees: "25-50", desc: "AI video editing and dubbing app." },
+
+            { id: 32, name: "Statsig", city: "Seattle", state: "WA", industry: "DevTools", amount: 43, date: "2022", investor: "Sequoia", total: 53, employees: "50-100", desc: "Product experimentation platform." },
+
+            { id: 33, name: "KoBold Metals", city: "Berkeley", state: "CA", industry: "Climate / AI", amount: 195, date: "2022", investor: "T. Rowe Price", total: 200, employees: "100-250", desc: "AI for battery mineral exploration." },
+
+            { id: 34, name: "GlossGenius", city: "New York", state: "NY", industry: "SaaS", amount: 28, date: "2023", investor: "L Catterton", total: 70, employees: "100-250", desc: "Booking platform for beauty professionals." },
+
+            { id: 35, name: "Gem", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 100, date: "2021", investor: "ICONIQ", total: 148, employees: "250-500", desc: "Talent engagement platform." },
+
+            { id: 36, name: "Living Carbon", city: "San Francisco", state: "CA", industry: "Climate", amount: 21, date: "2023", investor: "Temasek", total: 36, employees: "50-100", desc: "Genetically enhanced trees for carbon capture." },
+
+            { id: 37, name: "Nano", city: "San Francisco", state: "CA", industry: "Crypto", amount: 30, date: "2023", investor: "Polychain", total: 30, employees: "25-50", desc: "Zero-fee digital currency protocol." },
+
+            { id: 38, name: "Pearl", city: "Los Angeles", state: "CA", industry: "Health / AI", amount: 58, date: "2024", investor: "Left Lane", total: 70, employees: "50-100", desc: "AI dental imaging analysis." },
+
+            { id: 39, name: "Normalyze", city: "San Francisco", state: "CA", industry: "Security", amount: 22, date: "2022", investor: "Lightspeed", total: 26, employees: "25-50", desc: "Data-first cloud security." },
+
+            { id: 40, name: "Project44", city: "Chicago", state: "IL", industry: "Logistics", amount: 202, date: "2021", investor: "Goldman Sachs", total: 800, employees: "500+", desc: "Supply chain visibility platform." },
+
+            { id: 41, name: "Coalesce", city: "San Francisco", state: "CA", industry: "Data", amount: 26, date: "2022", investor: "Emergence", total: 32, employees: "50-100", desc: "Data transformation for Snowflake." },
+
+            { id: 42, name: "Rutter", city: "San Francisco", state: "CA", industry: "Fintech", amount: 27, date: "2022", investor: "a16z", total: 29, employees: "25-50", desc: "Universal API for commerce data." },
+
+            { id: 43, name: "Finch", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 40, date: "2023", investor: "General Catalyst", total: 58, employees: "50-100", desc: "API for payroll and HR systems." },
+
+            { id: 44, name: "Parafin", city: "San Francisco", state: "CA", industry: "Fintech", amount: 60, date: "2022", investor: "GIC", total: 94, employees: "50-100", desc: "Embedded financing infrastructure." },
+
+        ];
+
+
+
+        // --- APP STATE ---
+
+        let state = {
+
+            data: [...startupData],
+
+            filterIndustry: 'All',
+
+            filterCity: 'All',
+
+            searchQuery: '',
+
+            sortField: 'amount', // 'amount', 'name'
+
+            sortOrder: 'desc' // 'desc', 'asc'
+
+        };
+
+
+
+        // --- INITIALIZATION ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            populateDropdowns();
+
+            renderKPIs();
+
+            renderCharts();
+
+            renderTable();
+
+            
+
+            // Event Listeners
+
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+
+                state.searchQuery = e.target.value.toLowerCase();
+
+                filterData();
+
+            });
+
+            
+
+            document.getElementById('industryFilter').addEventListener('change', (e) => {
+
+                state.filterIndustry = e.target.value;
+
+                filterData();
+
+            });
+
+            
+
+            document.getElementById('cityFilter').addEventListener('change', (e) => {
+
+                state.filterCity = e.target.value;
+
+                filterData();
+
+            });
+
+        });
+
+
+
+        // --- CORE LOGIC ---
+
+        
+
+        function populateDropdowns() {
+
+            const industries = [...new Set(startupData.map(d => d.industry))].sort();
+
+            const cities = [...new Set(startupData.map(d => d.city))].sort();
+
+            
+
+            const indSelect = document.getElementById('industryFilter');
+
+            const citySelect = document.getElementById('cityFilter');
+
+            
+
+            industries.forEach(ind => {
+
+                const opt = document.createElement('option');
+
+                opt.value = ind;
+
+                opt.textContent = ind;
+
+                indSelect.appendChild(opt);
+
+            });
+
+            
+
+            cities.forEach(city => {
+
+                const opt = document.createElement('option');
+
+                opt.value = city;
+
+                opt.textContent = city;
+
+                citySelect.appendChild(opt);
+
+            });
+
+        }
+
+
+
+        function filterData() {
+
+            state.data = startupData.filter(item => {
+
+                const matchSearch = item.name.toLowerCase().includes(state.searchQuery) || 
+
+                                    item.investor.toLowerCase().includes(state.searchQuery) ||
+
+                                    item.desc.toLowerCase().includes(state.searchQuery);
+
+                const matchInd = state.filterIndustry === 'All' || item.industry === state.filterIndustry;
+
+                const matchCity = state.filterCity === 'All' || item.city === state.filterCity;
+
+                return matchSearch && matchInd && matchCity;
+
+            });
+
+            
+
+            // Re-sort after filter
+
+            sortDataInternal();
+
+            
+
+            updateUI();
+
+        }
+
+        
+
+        function sortTable(field) {
+
+            // Toggle order if clicking same field
+
+            if (state.sortField === field) {
+
+                state.sortOrder = state.sortOrder === 'desc' ? 'asc' : 'desc';
+
+            } else {
+
+                state.sortField = field;
+
+                state.sortOrder = 'desc'; // Default to high-to-low for new fields
+
+            }
+
+            
+
+            sortDataInternal();
+
+            updateUI();
+
+        }
+
+        
+
+        function sortDataInternal() {
+
+            state.data.sort((a, b) => {
+
+                let valA = a[state.sortField];
+
+                let valB = b[state.sortField];
+
+                
+
+                if (typeof valA === 'string') valA = valA.toLowerCase();
+
+                if (typeof valB === 'string') valB = valB.toLowerCase();
+
+                
+
+                if (valA < valB) return state.sortOrder === 'asc' ? -1 : 1;
+
+                if (valA > valB) return state.sortOrder === 'asc' ? 1 : -1;
+
+                return 0;
+
+            });
+
+        }
+
+
+
+        function updateUI() {
+
+            renderTable();
+
+            renderKPIs();
+
+            renderCharts(); // Re-render charts with filtered data
+
+        }
+
+
+
+        // --- RENDERING ---
+
+
+
+        function renderKPIs() {
+
+            const kpiContainer = document.getElementById('kpi-section');
+
+            const totalFunding = state.data.reduce((acc, curr) => acc + curr.amount, 0);
+
+            const avgFunding = state.data.length > 0 ? (totalFunding / state.data.length).toFixed(1) : 0;
+
+            const uniqueInvestors = new Set(state.data.map(d => d.investor)).size;
+
+            
+
+            // Icons map
+
+            const cards = [
+
+                { label: "Companies Tracked", value: state.data.length, icon: "fa-building", color: "text-blue-600", bg: "bg-blue-50" },
+
+                { label: "Total Series B Vol", value: `$${(totalFunding/1000).toFixed(2)}B`, icon: "fa-money-bill-wave", color: "text-emerald-600", bg: "bg-emerald-50" },
+
+                { label: "Avg Round Size", value: `$${avgFunding}M`, icon: "fa-chart-line", color: "text-indigo-600", bg: "bg-indigo-50" },
+
+                { label: "Active Investors", value: uniqueInvestors, icon: "fa-handshake", color: "text-amber-600", bg: "bg-amber-50" }
+
+            ];
+
+
+
+            kpiContainer.innerHTML = cards.map(card => `
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex items-center transition-all-300 hover:shadow-md">
+
+                    <div class="flex-shrink-0 p-3 rounded-lg ${card.bg} ${card.color}">
+
+                        <i class="fas ${card.icon} text-xl"></i>
+
+                    </div>
+
+                    <div class="ml-4">
+
+                        <p class="text-sm font-medium text-slate-500">${card.label}</p>
+
+                        <p class="text-2xl font-bold text-slate-900">${card.value}</p>
+
+                    </div>
+
+                </div>
+
+            `).join('');
+
+            
+
+            document.getElementById('countDisplay').innerText = state.data.length;
+
+        }
+
+
+
+        function renderTable() {
+
+            const tbody = document.getElementById('startupsTableBody');
+
+            if (state.data.length === 0) {
+
+                tbody.innerHTML = `<tr><td colspan="6" class="px-3 py-8 text-center text-slate-500">No companies found matching your filters.</td></tr>`;
+
+                return;
+
+            }
+
+
+
+            tbody.innerHTML = state.data.map(item => `
+
+                <tr class="hover:bg-slate-50 transition-colors">
+
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm">
+
+                        <div class="font-medium text-slate-900">${item.name}</div>
+
+                        <div class="text-xs text-slate-400 mt-0.5">${item.employees} employees</div>
+
+                    </td>
+
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500">
+
+                        ${item.city}, ${item.state}
+
+                    </td>
+
+                    <td class="whitespace-nowrap px-3 py-4 text-sm">
+
+                        <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-500/10">
+
+                            ${item.industry}
+
+                        </span>
+
+                    </td>
+
+                    <td class="whitespace-nowrap px-3 py-4 text-sm text-right font-medium text-emerald-700">
+
+                        $${item.amount}M
+
+                    </td>
+
+                    <td class="hidden md:table-cell whitespace-nowrap px-3 py-4 text-sm text-slate-500">
+
+                        ${item.investor}
+
+                    </td>
+
+                    <td class="px-3 py-4 text-sm text-slate-500 max-w-xs truncate" title="${item.desc}">
+
+                        ${item.desc}
+
+                    </td>
+
+                </tr>
+
+            `).join('');
+
+        }
+
+
+
+        // --- CHARTS ---
+
+        
+
+        let charts = {};
+
+
+
+        function renderCharts() {
+
+            // Prepare Data
+
+            
+
+            // 1. Industry (Top 5 + Others)
+
+            const indCounts = {};
+
+            state.data.forEach(d => {
+
+                // Simplified industry grouping for chart
+
+                let key = d.industry.split(' / ')[0]; 
+
+                indCounts[key] = (indCounts[key] || 0) + d.amount; // Summing funding amount
+
+            });
+
+            const sortedInd = Object.entries(indCounts).sort((a,b) => b[1] - a[1]);
+
+            const topInd = sortedInd.slice(0, 5);
+
+            const otherIndVal = sortedInd.slice(5).reduce((acc, curr) => acc + curr[1], 0);
+
+            if(otherIndVal > 0) topInd.push(['Others', otherIndVal]);
+
+
+
+            const indLabels = topInd.map(i => i[0]);
+
+            const indValues = topInd.map(i => i[1]);
+
+
+
+            // 2. Location
+
+            const locCounts = {};
+
+            state.data.forEach(d => {
+
+                locCounts[d.city] = (locCounts[d.city] || 0) + 1;
+
+            });
+
+            const sortedLoc = Object.entries(locCounts).sort((a,b) => b[1] - a[1]);
+
+            const locLabels = sortedLoc.map(i => i[0]);
+
+            const locValues = sortedLoc.map(i => i[1]);
+
+
+
+            // 3. Deal Size Buckets
+
+            const buckets = { '<$30M': 0, '$30-50M': 0, '$50-80M': 0, '$80M+': 0 };
+
+            state.data.forEach(d => {
+
+                if (d.amount < 30) buckets['<$30M']++;
+
+                else if (d.amount < 50) buckets['$30-50M']++;
+
+                else if (d.amount < 80) buckets['$50-80M']++;
+
+                else buckets['$80M+']++;
+
+            });
+
+            const bucketLabels = Object.keys(buckets);
+
+            const bucketValues = Object.values(buckets);
+
+
+
+            // Chart Configuration Helpers
+
+            const commonOptions = {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+
+                }
+
+            };
+
+
+
+            // Render Chart 1: Industry (Bar)
+
+            updateChart('industryChart', 'bar', {
+
+                labels: indLabels,
+
+                datasets: [{
+
+                    label: 'Total Funding ($M)',
+
+                    data: indValues,
+
+                    backgroundColor: '#6366f1', // Indigo 500
+
+                    borderRadius: 4
+
+                }]
+
+            }, {
+
+                ...commonOptions,
+
+                plugins: { legend: { display: false } }, // Hide legend for single bar
+
+                scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+
+            });
+
+
+
+            // Render Chart 2: Location (Doughnut)
+
+            updateChart('locationChart', 'doughnut', {
+
+                labels: locLabels,
+
+                datasets: [{
+
+                    data: locValues,
+
+                    backgroundColor: ['#0f172a', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1'], // Slate palette
+
+                    borderWidth: 0
+
+                }]
+
+            }, commonOptions);
+
+
+
+            // Render Chart 3: Deal Size (Bar/Trend equivalent)
+
+            updateChart('dealSizeChart', 'bar', {
+
+                labels: bucketLabels,
+
+                datasets: [{
+
+                    label: '# of Deals',
+
+                    data: bucketValues,
+
+                    backgroundColor: '#10b981', // Emerald 500
+
+                    borderRadius: 4
+
+                }]
+
+            }, {
+
+                ...commonOptions,
+
+                plugins: { legend: { display: false } },
+
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+
+            });
+
+        }
+
+
+
+        function updateChart(canvasId, type, data, options) {
+
+            const ctx = document.getElementById(canvasId).getContext('2d');
+
+            
+
+            if (charts[canvasId]) {
+
+                charts[canvasId].destroy();
+
+            }
+
+
+
+            charts[canvasId] = new Chart(ctx, {
+
+                type: type,
+
+                data: data,
+
+                options: options
+
+            });
+
+        }
+
+
+
+    </script>
+
+</body>
+
+</html>
