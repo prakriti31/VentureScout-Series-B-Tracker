@@ -1,0 +1,550 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.3">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="en"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;VentureScout: Series B Startup Tracker&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Tailwind CSS --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Chart.js --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Font Awesome --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Chosen Palette: Warm Professional --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Primary: Slate/Zinc (Backgrounds), Deep Indigo (Accents), Emerald (Success/Money) --&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap');</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Inter', sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #f8fafc; /* Slate 50 */</p>
+<p class="p1"><span class="Apple-converted-space">            </span>color: #1e293b; /* Slate 800 */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* Chart Container Styling - Critical for Responsiveness */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.chart-container {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>max-width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>height: 300px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>max-height: 350px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* Custom Scrollbar for Table */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-scrollbar::-webkit-scrollbar {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>width: 6px;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>height: 6px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-scrollbar::-webkit-scrollbar-track {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background: #f1f5f9;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-scrollbar::-webkit-scrollbar-thumb {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #cbd5e1;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 4px;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.custom-scrollbar::-webkit-scrollbar-thumb:hover {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>background-color: #94a3b8;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>/* Smooth Transitions */</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.transition-all-300 {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.3s ease-in-out;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Application Structure Plan:</p>
+<p class="p1"><span class="Apple-converted-space">         </span>1. Header &amp; Context: Introduction to the dataset and scope (Series B, Major Hubs).</p>
+<p class="p1"><span class="Apple-converted-space">         </span>2. KPI Dashboard: High-level aggregate metrics (Total Funding, Avg Deal Size) to give immediate market context.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>3. Visual Analytics Section: Three chart columns to visualize Industry dominance, Geographic split, and Deal Size distribution.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>4. Control Center: Interactive Search and Filters (Industry, City) to allow users to slice the data.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>5. Data Grid: A comprehensive, sortable table presenting the core "Source Report" data (40+ companies).</p>
+<p class="p1"><span class="Apple-converted-space">         </span>6. Footer: Sourcing notes.</p>
+<p class="p2"><span class="Apple-converted-space">         </span></p>
+<p class="p1"><span class="Apple-converted-space">         </span>Rationale: This structure moves from macro (charts) to micro (individual company rows), allowing users to understand trends before drilling into specific leads.</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Visualization &amp; Content Choices:</p>
+<p class="p1"><span class="Apple-converted-space">         </span>1. "Funding by Industry" (Bar Chart): Comparison goal. Shows which sectors are attracting the most Series B capital.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>2. "Hub Distribution" (Doughnut Chart): Relationship goal. Visualizes the dominance of Silicon Valley vs. other emerging hubs.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>3. "Deal Size Distribution" (Line/Area): Distribution goal. Helps users understand what a "typical" Series B looks like in this cohort.</p>
+<p class="p1"><span class="Apple-converted-space">         </span>4. Interactive Table: Organization goal. The most efficient way to present structured text/numeric data for 40+ entities.</p>
+<p class="p2"><span class="Apple-converted-space">         </span></p>
+<p class="p1"><span class="Apple-converted-space">         </span>CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body class="antialiased selection:bg-indigo-100 selection:text-indigo-800"&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Main Container --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"&gt;</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Header Section --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;header class="mb-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="flex flex-col md:flex-row md:justify-between md:items-end"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h1 class="text-3xl font-bold text-slate-900 tracking-tight"&gt;VentureScout &lt;span class="text-indigo-600"&gt;Series B Tracker&lt;/span&gt;&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p class="mt-2 text-slate-600 max-w-2xl text-sm leading-relaxed"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>A curated market research dashboard analyzing high-growth startups that have recently raised &lt;strong&gt;Series B funding&lt;/strong&gt;.<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>The dataset covers key innovation hubs (Bay Area, NYC, Seattle, Chicago) across major sectors like AI, Fintech, and Climate.<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>Use the filters below to identify potential partners, competitors, or investment opportunities.</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="mt-4 md:mt-0 text-right"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;span class="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;i class="fas fa-check-circle mr-1.5"&gt;&lt;/i&gt; Data Updated: Feb 2026</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/header&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- KPI Cards --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;section id="kpi-section" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- Dynamic KPI Cards will be injected here by JS --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/section&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Visualization Section --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;section class="mb-10"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;h2 class="text-lg font-semibold text-slate-900"&gt;Market Insights&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;p class="text-sm text-slate-500"&gt;Visualizing capital allocation across industries and geographies.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="grid grid-cols-1 lg:grid-cols-3 gap-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;!-- Chart 1: Industry Breakdown --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h3 class="text-sm font-medium text-slate-700 mb-4"&gt;Total Funding by Industry&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="chart-container flex-grow"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;canvas id="industryChart"&gt;&lt;/canvas&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;!-- Chart 2: Location Split --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h3 class="text-sm font-medium text-slate-700 mb-4"&gt;Headquarters Distribution&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="chart-container flex-grow"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;canvas id="locationChart"&gt;&lt;/canvas&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;!-- Chart 3: Deal Velocity (Simulated Year) --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h3 class="text-sm font-medium text-slate-700 mb-4"&gt;Avg. Deal Size ($M)&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="chart-container flex-grow"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;canvas id="dealSizeChart"&gt;&lt;/canvas&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/section&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Interactive Data Section --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"&gt;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- Controls Toolbar --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="p-5 border-b border-slate-200 bg-slate-50/50 flex flex-col lg:flex-row gap-4 justify-between items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;!-- Search --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="relative w-full sm:w-64"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;i class="fas fa-search text-slate-400"&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="text" id="searchInput" class="block w-full rounded-md border-0 py-2 pl-10 text-slate-900 ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Search company or investor..."&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">                    </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;!-- Filters --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;select id="industryFilter" class="block w-full sm:w-48 rounded-md border-0 py-2 pl-3 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;option value="All"&gt;All Industries&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;!-- Options populated by JS --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/select&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;select id="cityFilter" class="block w-full sm:w-40 rounded-md border-0 py-2 pl-3 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;option value="All"&gt;All Locations&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;!-- Options populated by JS --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="text-sm text-slate-500 font-medium"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>Showing &lt;span id="countDisplay" class="text-slate-900"&gt;0&lt;/span&gt; companies</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- Table --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="overflow-x-auto custom-scrollbar"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;table class="min-w-full divide-y divide-slate-300"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;thead class="bg-slate-50"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;th scope="col" class="py-3.5 pl-4 pr-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-indigo-600" onclick="sortTable('name')"&gt;Company &lt;i class="fas fa-sort ml-1"&gt;&lt;/i&gt;&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;th scope="col" class="px-3 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider"&gt;Location&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;th scope="col" class="px-3 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider"&gt;Industry&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;th scope="col" class="px-3 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-indigo-600" onclick="sortTable('amount')"&gt;Series B ($M) &lt;i class="fas fa-sort ml-1"&gt;&lt;/i&gt;&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;th scope="col" class="hidden md:table-cell px-3 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider"&gt;Lead Investor&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;th scope="col" class="px-3 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider"&gt;Description&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/thead&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;tbody id="startupsTableBody" class="divide-y divide-slate-200 bg-white"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;!-- Rows populated by JS --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/tbody&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/table&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- Pagination / Footer of Table --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="border-t border-slate-200 px-4 py-3 bg-slate-50 flex justify-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;p class="text-xs text-slate-500"&gt;Sorted by relevance and funding momentum.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/section&gt;</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;footer class="mt-8 border-t border-slate-200 pt-6 text-center text-xs text-slate-400"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p&gt;Sources: Aggregated from Crunchbase, TechCrunch, and SEC Filings (2022-2025). Employee counts are estimates.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p class="mt-1"&gt;&amp;copy; 2026 VentureScout Analytics.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/footer&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Application Logic --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- DATASET: The "Source Report" Content ---</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// A curated list of ~45 companies fitting the Series B, recent, specific geography criteria.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const startupData = [</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 1, name: "Harvey", city: "San Francisco", state: "CA", industry: "AI / Legal", amount: 80, date: "2023", investor: "Sequoia", total: 106, employees: "50-100", desc: "Generative AI platform for elite law firms." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 2, name: "Supabase", city: "San Francisco", state: "CA", industry: "DevTools", amount: 80, date: "2022", investor: "Felicis", total: 116, employees: "100-250", desc: "Open source Firebase alternative." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 3, name: "Watershed", city: "San Francisco", state: "CA", industry: "Climate", amount: 70, date: "2022", investor: "Sequoia", total: 120, employees: "250-500", desc: "Enterprise carbon footprint measurement." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 4, name: "Warp", city: "New York", state: "NY", industry: "DevTools", amount: 50, date: "2023", investor: "Sequoia", total: 73, employees: "50-100", desc: "Rust-based modern terminal." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 5, name: "Clay", city: "New York", state: "NY", industry: "SaaS / Sales", amount: 46, date: "2024", investor: "Meritech", total: 62, employees: "50-100", desc: "Automated data enrichment for sales teams." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 6, name: "Imbue", city: "San Francisco", state: "CA", industry: "AI / Research", amount: 200, date: "2023", investor: "Astera Institute", total: 220, employees: "50-100", desc: "Building AI agents that can reason and code." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 7, name: "Hex", city: "San Francisco", state: "CA", industry: "Data", amount: 52, date: "2022", investor: "a16z", total: 96, employees: "100-250", desc: "Collaborative data science workspace." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 8, name: "Vanta", city: "San Francisco", state: "CA", industry: "Security", amount: 110, date: "2022", investor: "Craft Ventures", total: 203, employees: "250-500", desc: "Automated security compliance (SOC2/HIPAA)." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 9, name: "Pave", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 100, date: "2022", investor: "Index Ventures", total: 160, employees: "150-300", desc: "Real-time compensation planning data." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 10, name: "MotherDuck", city: "Seattle", state: "WA", industry: "Data", amount: 52.5, date: "2023", investor: "Felicis", total: 100, employees: "50-100", desc: "Serverless data analytics with DuckDB." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 11, name: "Character.ai", city: "Menlo Park", state: "CA", industry: "AI / Consumer", amount: 150, date: "2023", investor: "a16z", total: 150, employees: "100-250", desc: "Open-ended conversational AI applications." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 12, name: "Shield AI", city: "San Diego", state: "CA", industry: "Defense / AI", amount: 165, date: "2022", investor: "Snowpoint", total: 500, employees: "500+", desc: "AI pilot systems for autonomous aircraft." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 13, name: "Linear", city: "San Francisco", state: "CA", industry: "DevTools", amount: 35, date: "2023", investor: "Accel", total: 52, employees: "50-100", desc: "Issue tracking built for speed and design." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 14, name: "Ampla", city: "New York", state: "NY", industry: "Fintech", amount: 40, date: "2022", investor: "VMG Partners", total: 380, employees: "50-100", desc: "Financial platform for CPG brands." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 15, name: "Kin Insurance", city: "Chicago", state: "IL", industry: "Insurtech", amount: 82, date: "2022", investor: "QED Investors", total: 250, employees: "250-500", desc: "Direct-to-consumer home insurance." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 16, name: "Chronosphere", city: "New York", state: "NY", industry: "DevOps", amount: 200, date: "2022", investor: "General Atlantic", total: 300, employees: "250-500", desc: "Cloud-native observability platform." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 17, name: "Modern Treasury", city: "San Francisco", state: "CA", industry: "Fintech", amount: 85, date: "2022", investor: "Altimeter", total: 133, employees: "100-250", desc: "Payment operations software." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 18, name: "Sardine", city: "San Francisco", state: "CA", industry: "Fintech / Fraud", amount: 51.5, date: "2022", investor: "a16z", total: 75, employees: "50-100", desc: "Fraud prevention and compliance platform." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 19, name: "Bilt Rewards", city: "New York", state: "NY", industry: "Fintech / Prop", amount: 150, date: "2022", investor: "Left Lane", total: 213, employees: "100-250", desc: "Rewards program for paying rent." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 20, name: "Unstructured", city: "San Francisco", state: "CA", industry: "AI / Data", amount: 40, date: "2024", investor: "Menlo", total: 65, employees: "25-50", desc: "ETL for LLMs; unstructured data processing." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 21, name: "LangChain", city: "San Francisco", state: "CA", industry: "AI / DevTools", amount: 25, date: "2024", investor: "Sequoia", total: 35, employees: "25-50", desc: "Framework for developing LLM applications." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 22, name: "Together AI", city: "San Francisco", state: "CA", industry: "AI / Cloud", amount: 102, date: "2023", investor: "Kleiner Perkins", total: 130, employees: "50-100", desc: "Cloud platform for training generative AI." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 23, name: "Chainguard", city: "Seattle", state: "WA", industry: "Security", amount: 61, date: "2023", investor: "Spark Capital", total: 116, employees: "50-100", desc: "Software supply chain security." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 24, name: "Neon", city: "San Francisco", state: "CA", industry: "DevTools", amount: 46, date: "2023", investor: "Menlo", total: 104, employees: "50-100", desc: "Serverless Postgres database." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 25, name: "Pachama", city: "San Francisco", state: "CA", industry: "Climate", amount: 55, date: "2022", investor: "Future Positive", total: 79, employees: "50-100", desc: "AI-verified forest carbon credits." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 26, name: "Regard", city: "Los Angeles", state: "CA", industry: "Health / AI", amount: 30, date: "2024", investor: "Oak HC/FT", total: 50, employees: "50-100", desc: "AI co-pilot for clinicians." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 27, name: "Capital", city: "New York", state: "NY", industry: "Fintech", amount: 40, date: "2023", investor: "Founders Fund", total: 50, employees: "50-100", desc: "The founders' bank platform." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 28, name: "Owner.com", city: "Palo Alto", state: "CA", industry: "SaaS", amount: 33, date: "2023", investor: "Redpoint", total: 58, employees: "100-250", desc: "All-in-one platform for restaurant owners." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 29, name: "EvenUp", city: "San Francisco", state: "CA", industry: "Legal AI", amount: 50, date: "2023", investor: "Bessemer", total: 65, employees: "50-100", desc: "AI for personal injury law claims." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 30, name: "Abridge", city: "Pittsburgh/SF", state: "CA", industry: "Health / AI", amount: 150, date: "2024", investor: "Lightspeed", total: 212, employees: "50-100", desc: "Generative AI for medical documentation." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 31, name: "Captions", city: "New York", state: "NY", industry: "AI / Media", amount: 60, date: "2024", investor: "Index", total: 100, employees: "25-50", desc: "AI video editing and dubbing app." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 32, name: "Statsig", city: "Seattle", state: "WA", industry: "DevTools", amount: 43, date: "2022", investor: "Sequoia", total: 53, employees: "50-100", desc: "Product experimentation platform." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 33, name: "KoBold Metals", city: "Berkeley", state: "CA", industry: "Climate / AI", amount: 195, date: "2022", investor: "T. Rowe Price", total: 200, employees: "100-250", desc: "AI for battery mineral exploration." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 34, name: "GlossGenius", city: "New York", state: "NY", industry: "SaaS", amount: 28, date: "2023", investor: "L Catterton", total: 70, employees: "100-250", desc: "Booking platform for beauty professionals." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 35, name: "Gem", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 100, date: "2021", investor: "ICONIQ", total: 148, employees: "250-500", desc: "Talent engagement platform." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 36, name: "Living Carbon", city: "San Francisco", state: "CA", industry: "Climate", amount: 21, date: "2023", investor: "Temasek", total: 36, employees: "50-100", desc: "Genetically enhanced trees for carbon capture." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 37, name: "Nano", city: "San Francisco", state: "CA", industry: "Crypto", amount: 30, date: "2023", investor: "Polychain", total: 30, employees: "25-50", desc: "Zero-fee digital currency protocol." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 38, name: "Pearl", city: "Los Angeles", state: "CA", industry: "Health / AI", amount: 58, date: "2024", investor: "Left Lane", total: 70, employees: "50-100", desc: "AI dental imaging analysis." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 39, name: "Normalyze", city: "San Francisco", state: "CA", industry: "Security", amount: 22, date: "2022", investor: "Lightspeed", total: 26, employees: "25-50", desc: "Data-first cloud security." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 40, name: "Project44", city: "Chicago", state: "IL", industry: "Logistics", amount: 202, date: "2021", investor: "Goldman Sachs", total: 800, employees: "500+", desc: "Supply chain visibility platform." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 41, name: "Coalesce", city: "San Francisco", state: "CA", industry: "Data", amount: 26, date: "2022", investor: "Emergence", total: 32, employees: "50-100", desc: "Data transformation for Snowflake." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 42, name: "Rutter", city: "San Francisco", state: "CA", industry: "Fintech", amount: 27, date: "2022", investor: "a16z", total: 29, employees: "25-50", desc: "Universal API for commerce data." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 43, name: "Finch", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 40, date: "2023", investor: "General Catalyst", total: 58, employees: "50-100", desc: "API for payroll and HR systems." },</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{ id: 44, name: "Parafin", city: "San Francisco", state: "CA", industry: "Fintech", amount: 60, date: "2022", investor: "GIC", total: 94, employees: "50-100", desc: "Embedded financing infrastructure." },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- APP STATE ---</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let state = {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>data: [...startupData],</p>
+<p class="p1"><span class="Apple-converted-space">            </span>filterIndustry: 'All',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>filterCity: 'All',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>searchQuery: '',</p>
+<p class="p1"><span class="Apple-converted-space">            </span>sortField: 'amount', // 'amount', 'name'</p>
+<p class="p1"><span class="Apple-converted-space">            </span>sortOrder: 'desc' // 'desc', 'asc'</p>
+<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- INITIALIZATION ---</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.addEventListener('DOMContentLoaded', () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>populateDropdowns();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>renderKPIs();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>renderCharts();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>renderTable();</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Event Listeners</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('searchInput').addEventListener('input', (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>state.searchQuery = e.target.value.toLowerCase();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>filterData();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('industryFilter').addEventListener('change', (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>state.filterIndustry = e.target.value;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>filterData();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('cityFilter').addEventListener('change', (e) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>state.filterCity = e.target.value;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>filterData();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- CORE LOGIC ---</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function populateDropdowns() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const industries = [...new Set(startupData.map(d =&gt; d.industry))].sort();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const cities = [...new Set(startupData.map(d =&gt; d.city))].sort();</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const indSelect = document.getElementById('industryFilter');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const citySelect = document.getElementById('cityFilter');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>industries.forEach(ind =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const opt = document.createElement('option');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>opt.value = ind;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>opt.textContent = ind;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>indSelect.appendChild(opt);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>cities.forEach(city =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const opt = document.createElement('option');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>opt.value = city;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>opt.textContent = city;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>citySelect.appendChild(opt);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function filterData() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>state.data = startupData.filter(item =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const matchSearch = item.name.toLowerCase().includes(state.searchQuery) ||<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>item.investor.toLowerCase().includes(state.searchQuery) ||</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>item.desc.toLowerCase().includes(state.searchQuery);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const matchInd = state.filterIndustry === 'All' || item.industry === state.filterIndustry;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const matchCity = state.filterCity === 'All' || item.city === state.filterCity;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return matchSearch &amp;&amp; matchInd &amp;&amp; matchCity;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Re-sort after filter</p>
+<p class="p1"><span class="Apple-converted-space">            </span>sortDataInternal();</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>updateUI();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function sortTable(field) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Toggle order if clicking same field</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (state.sortField === field) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>state.sortOrder = state.sortOrder === 'desc' ? 'asc' : 'desc';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>state.sortField = field;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>state.sortOrder = 'desc'; // Default to high-to-low for new fields</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>sortDataInternal();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>updateUI();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function sortDataInternal() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>state.data.sort((a, b) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>let valA = a[state.sortField];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>let valB = b[state.sortField];</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (typeof valA === 'string') valA = valA.toLowerCase();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (typeof valB === 'string') valB = valB.toLowerCase();</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (valA &lt; valB) return state.sortOrder === 'asc' ? -1 : 1;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (valA &gt; valB) return state.sortOrder === 'asc' ? 1 : -1;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function updateUI() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>renderTable();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>renderKPIs();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>renderCharts(); // Re-render charts with filtered data</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- RENDERING ---</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function renderKPIs() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const kpiContainer = document.getElementById('kpi-section');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const totalFunding = state.data.reduce((acc, curr) =&gt; acc + curr.amount, 0);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const avgFunding = state.data.length &gt; 0 ? (totalFunding / state.data.length).toFixed(1) : 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const uniqueInvestors = new Set(state.data.map(d =&gt; d.investor)).size;</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Icons map</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const cards = [</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ label: "Companies Tracked", value: state.data.length, icon: "fa-building", color: "text-blue-600", bg: "bg-blue-50" },</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ label: "Total Series B Vol", value: `$${(totalFunding/1000).toFixed(2)}B`, icon: "fa-money-bill-wave", color: "text-emerald-600", bg: "bg-emerald-50" },</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ label: "Avg Round Size", value: `$${avgFunding}M`, icon: "fa-chart-line", color: "text-indigo-600", bg: "bg-indigo-50" },</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{ label: "Active Investors", value: uniqueInvestors, icon: "fa-handshake", color: "text-amber-600", bg: "bg-amber-50" }</p>
+<p class="p1"><span class="Apple-converted-space">            </span>];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>kpiContainer.innerHTML = cards.map(card =&gt; `</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex items-center transition-all-300 hover:shadow-md"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex-shrink-0 p-3 rounded-lg ${card.bg} ${card.color}"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;i class="fas ${card.icon} text-xl"&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="ml-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;p class="text-sm font-medium text-slate-500"&gt;${card.label}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;p class="text-2xl font-bold text-slate-900"&gt;${card.value}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>`).join('');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('countDisplay').innerText = state.data.length;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function renderTable() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const tbody = document.getElementById('startupsTableBody');</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (state.data.length === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>tbody.innerHTML = `&lt;tr&gt;&lt;td colspan="6" class="px-3 py-8 text-center text-slate-500"&gt;No companies found matching your filters.&lt;/td&gt;&lt;/tr&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>tbody.innerHTML = state.data.map(item =&gt; `</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;tr class="hover:bg-slate-50 transition-colors"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="font-medium text-slate-900"&gt;${item.name}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="text-xs text-slate-400 mt-0.5"&gt;${item.employees} employees&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>${item.city}, ${item.state}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;td class="whitespace-nowrap px-3 py-4 text-sm"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-500/10"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>${item.industry}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;td class="whitespace-nowrap px-3 py-4 text-sm text-right font-medium text-emerald-700"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>$${item.amount}M</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;td class="hidden md:table-cell whitespace-nowrap px-3 py-4 text-sm text-slate-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>${item.investor}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;td class="px-3 py-4 text-sm text-slate-500 max-w-xs truncate" title="${item.desc}"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>${item.desc}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>`).join('');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- CHARTS ---</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>let charts = {};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function renderCharts() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Prepare Data</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 1. Industry (Top 5 + Others)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const indCounts = {};</p>
+<p class="p1"><span class="Apple-converted-space">            </span>state.data.forEach(d =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Simplified industry grouping for chart</p>
+<p class="p1"><span class="Apple-converted-space">                </span>let key = d.industry.split(' / ')[0];<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>indCounts[key] = (indCounts[key] || 0) + d.amount; // Summing funding amount</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const sortedInd = Object.entries(indCounts).sort((a,b) =&gt; b[1] - a[1]);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const topInd = sortedInd.slice(0, 5);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const otherIndVal = sortedInd.slice(5).reduce((acc, curr) =&gt; acc + curr[1], 0);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if(otherIndVal &gt; 0) topInd.push(['Others', otherIndVal]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>const indLabels = topInd.map(i =&gt; i[0]);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const indValues = topInd.map(i =&gt; i[1]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 2. Location</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const locCounts = {};</p>
+<p class="p1"><span class="Apple-converted-space">            </span>state.data.forEach(d =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>locCounts[d.city] = (locCounts[d.city] || 0) + 1;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const sortedLoc = Object.entries(locCounts).sort((a,b) =&gt; b[1] - a[1]);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const locLabels = sortedLoc.map(i =&gt; i[0]);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const locValues = sortedLoc.map(i =&gt; i[1]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// 3. Deal Size Buckets</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const buckets = { '&lt;$30M': 0, '$30-50M': 0, '$50-80M': 0, '$80M+': 0 };</p>
+<p class="p1"><span class="Apple-converted-space">            </span>state.data.forEach(d =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (d.amount &lt; 30) buckets['&lt;$30M']++;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>else if (d.amount &lt; 50) buckets['$30-50M']++;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>else if (d.amount &lt; 80) buckets['$50-80M']++;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>else buckets['$80M+']++;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const bucketLabels = Object.keys(buckets);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const bucketValues = Object.values(buckets);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Chart Configuration Helpers</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const commonOptions = {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>responsive: true,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>maintainAspectRatio: false,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>plugins: {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Render Chart 1: Industry (Bar)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>updateChart('industryChart', 'bar', {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>labels: indLabels,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>datasets: [{</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>label: 'Total Funding ($M)',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>data: indValues,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>backgroundColor: '#6366f1', // Indigo 500</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>borderRadius: 4</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}]</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}, {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>...commonOptions,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>plugins: { legend: { display: false } }, // Hide legend for single bar</p>
+<p class="p1"><span class="Apple-converted-space">                </span>scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Render Chart 2: Location (Doughnut)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>updateChart('locationChart', 'doughnut', {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>labels: locLabels,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>datasets: [{</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>data: locValues,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>backgroundColor: ['#0f172a', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1'], // Slate palette</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>borderWidth: 0</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}]</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}, commonOptions);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Render Chart 3: Deal Size (Bar/Trend equivalent)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>updateChart('dealSizeChart', 'bar', {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>labels: bucketLabels,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>datasets: [{</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>label: '# of Deals',</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>data: bucketValues,</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>backgroundColor: '#10b981', // Emerald 500</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>borderRadius: 4</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}]</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}, {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>...commonOptions,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>plugins: { legend: { display: false } },</p>
+<p class="p1"><span class="Apple-converted-space">                </span>scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function updateChart(canvasId, type, data, options) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const ctx = document.getElementById(canvasId).getContext('2d');</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (charts[canvasId]) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>charts[canvasId].destroy();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>charts[canvasId] = new Chart(ctx, {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>type: type,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>data: data,</p>
+<p class="p1"><span class="Apple-converted-space">                </span>options: options</p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
