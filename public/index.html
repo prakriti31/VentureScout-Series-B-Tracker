@@ -1,1067 +1,819 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>VentureScout: Series B Startup Tracker</title>
-
+    <title>VentureScout Pro: Series B Outreach Engine</title>
     <!-- Tailwind CSS -->
-
     <script src="https://cdn.tailwindcss.com"></script>
-
     <!-- Chart.js -->
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <!-- Font Awesome -->
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     
-
-    <!-- Chosen Palette: Warm Professional -->
-
-    <!-- Primary: Slate/Zinc (Backgrounds), Deep Indigo (Accents), Emerald (Success/Money) -->
-
+    <!-- Chosen Palette: "Deal Flow" - Slate/Zinc base, Indigo primary, Amber for 'Opportunity' actions -->
     
-
     <style>
-
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
         
-
         body {
-
             font-family: 'Inter', sans-serif;
-
-            background-color: #f8fafc; /* Slate 50 */
-
-            color: #1e293b; /* Slate 800 */
-
+            background-color: #f1f5f9; /* Slate 100 */
+            color: #0f172a; /* Slate 900 */
         }
 
-
-
-        /* Chart Container Styling - Critical for Responsiveness */
-
+        /* Chart Container Styling */
         .chart-container {
-
             position: relative;
-
             width: 100%;
-
-            max-width: 100%;
-
-            height: 300px;
-
-            max-height: 350px;
-
+            height: 250px; 
+            max-height: 300px;
         }
 
-
-
-        /* Custom Scrollbar for Table */
-
+        /* Custom Scrollbar */
         .custom-scrollbar::-webkit-scrollbar {
-
             width: 6px;
-
             height: 6px;
-
         }
-
         .custom-scrollbar::-webkit-scrollbar-track {
-
-            background: #f1f5f9;
-
+            background: #e2e8f0;
         }
-
         .custom-scrollbar::-webkit-scrollbar-thumb {
-
-            background-color: #cbd5e1;
-
-            border-radius: 4px;
-
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-
             background-color: #94a3b8;
-
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: #64748b;
         }
 
-
-
-        /* Smooth Transitions */
-
-        .transition-all-300 {
-
-            transition: all 0.3s ease-in-out;
-
+        /* Modal Animation */
+        .modal-enter {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        .modal-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 200ms, transform 200ms;
+        }
+        .modal-exit {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .modal-exit-active {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 200ms, transform 200ms;
         }
 
+        .glass-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #e2e8f0;
+        }
     </style>
-
     
-
     <!-- Application Structure Plan:
-
-         1. Header & Context: Introduction to the dataset and scope (Series B, Major Hubs).
-
-         2. KPI Dashboard: High-level aggregate metrics (Total Funding, Avg Deal Size) to give immediate market context.
-
-         3. Visual Analytics Section: Three chart columns to visualize Industry dominance, Geographic split, and Deal Size distribution.
-
-         4. Control Center: Interactive Search and Filters (Industry, City) to allow users to slice the data.
-
-         5. Data Grid: A comprehensive, sortable table presenting the core "Source Report" data (40+ companies).
-
-         6. Footer: Sourcing notes.
-
-         
-
-         Rationale: This structure moves from macro (charts) to micro (individual company rows), allowing users to understand trends before drilling into specific leads.
-
+         1. Header: Context + KPI High-level stats.
+         2. Visual Analytics: Charts for Industry/Location context.
+         3. "The War Room" (Table): The core list. Added a specific action column "Strategy Dossier".
+         4. Modal (The "Dossier"): This is the new key feature. It is hidden by default. When a user clicks a row, this overlays the screen with the CEO Name, Predicted Email, and the "Pitch/Problem Statement" specific to that company.
     -->
-
     
-
     <!-- Visualization & Content Choices:
-
-         1. "Funding by Industry" (Bar Chart): Comparison goal. Shows which sectors are attracting the most Series B capital.
-
-         2. "Hub Distribution" (Doughnut Chart): Relationship goal. Visualizes the dominance of Silicon Valley vs. other emerging hubs.
-
-         3. "Deal Size Distribution" (Line/Area): Distribution goal. Helps users understand what a "typical" Series B looks like in this cohort.
-
-         4. Interactive Table: Organization goal. The most efficient way to present structured text/numeric data for 40+ entities.
-
-         
-
-         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
-
+         - New Data Points: CEO Name, Email Pattern, Custom Pitch.
+         - Interaction: Modal overlay is used to present the "Private" contact info to prevent cluttering the main view and to make the data feel exclusive/valuable.
+         - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
     -->
-
 </head>
+<body class="antialiased text-slate-800">
 
-<body class="antialiased selection:bg-indigo-100 selection:text-indigo-800">
-
-
-
-    <!-- Main Container -->
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-        
-
-        <!-- Header Section -->
-
-        <header class="mb-8">
-
-            <div class="flex flex-col md:flex-row md:justify-between md:items-end">
-
+    <!-- Navbar / Header -->
+    <nav class="glass-header sticky top-0 z-30 px-4 sm:px-6 lg:px-8 py-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 text-white p-2 rounded-lg">
+                    <i class="fas fa-search-dollar text-xl"></i>
+                </div>
                 <div>
-
-                    <h1 class="text-3xl font-bold text-slate-900 tracking-tight">VentureScout <span class="text-indigo-600">Series B Tracker</span></h1>
-
-                    <p class="mt-2 text-slate-600 max-w-2xl text-sm leading-relaxed">
-
-                        A curated market research dashboard analyzing high-growth startups that have recently raised <strong>Series B funding</strong>. 
-
-                        The dataset covers key innovation hubs (Bay Area, NYC, Seattle, Chicago) across major sectors like AI, Fintech, and Climate. 
-
-                        Use the filters below to identify potential partners, competitors, or investment opportunities.
-
-                    </p>
-
+                    <h1 class="text-xl font-bold tracking-tight text-slate-900">VentureScout <span class="text-indigo-600">Pro</span></h1>
+                    <p class="text-xs text-slate-500 font-medium">Series B Outreach Intelligence Engine</p>
                 </div>
-
-                <div class="mt-4 md:mt-0 text-right">
-
-                    <span class="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
-
-                        <i class="fas fa-check-circle mr-1.5"></i> Data Updated: Feb 2026
-
-                    </span>
-
+            </div>
+            <div class="flex gap-3 text-sm">
+                <div class="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full flex items-center">
+                    <i class="fas fa-bolt mr-2"></i> 44 Active Opportunities
                 </div>
-
+                <div class="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full flex items-center">
+                    <i class="fas fa-envelope-open-text mr-2"></i> Pitch Scripts Ready
+                </div>
             </div>
+        </div>
+    </nav>
 
-        </header>
-
-
-
-        <!-- KPI Cards -->
-
-        <section id="kpi-section" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-
-            <!-- Dynamic KPI Cards will be injected here by JS -->
-
-        </section>
-
-
-
-        <!-- Visualization Section -->
-
-        <section class="mb-10">
-
-            <div class="mb-4">
-
-                <h2 class="text-lg font-semibold text-slate-900">Market Insights</h2>
-
-                <p class="text-sm text-slate-500">Visualizing capital allocation across industries and geographies.</p>
-
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Context Banner -->
+        <div class="bg-gradient-to-r from-indigo-900 to-slate-900 rounded-2xl p-6 sm:p-10 mb-8 text-white shadow-xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-4 opacity-10">
+                <i class="fas fa-chess-king text-9xl"></i>
             </div>
+            <div class="relative z-10 max-w-2xl">
+                <h2 class="text-2xl font-bold mb-2">Ready to Outreach?</h2>
+                <p class="text-indigo-200 mb-6 text-sm leading-relaxed">
+                    This dashboard identifies high-growth Series B startups. We've enriched the data with <strong>CEO contact patterns</strong> and <strong>custom problem statements</strong> based on their current tech stack and market position. Use the "Key" icon <i class="fas fa-key mx-1"></i> to unlock the outreach dossier for each prospect.
+                </p>
+            </div>
+        </div>
 
-            
+        <!-- Analytics Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Capital Allocation (By Sector)</h3>
+                <div class="chart-container">
+                    <canvas id="industryChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Geographic Density</h3>
+                <div class="chart-container">
+                    <canvas id="locationChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Outreach Stats</h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                        <span class="text-sm text-slate-600">Total Funding Tracked</span>
+                        <span class="font-bold text-slate-900">$3.82B</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                        <span class="text-sm text-slate-600">Avg. Employees</span>
+                        <span class="font-bold text-slate-900">~115</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                        <span class="text-sm text-slate-600">Target Decision Makers</span>
+                        <span class="font-bold text-indigo-600">44 CEOs</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Filter Controls -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
+            <div class="relative w-full sm:w-96">
+                <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
+                <input type="text" id="searchInput" placeholder="Search company, CEO, or industry..." 
+                       class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm shadow-sm transition-all">
+            </div>
+            <div class="flex gap-2 w-full sm:w-auto">
+                <select id="industryFilter" class="w-full sm:w-auto px-4 py-2 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm cursor-pointer">
+                    <option value="All">All Industries</option>
+                </select>
+                <select id="cityFilter" class="w-full sm:w-auto px-4 py-2 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm cursor-pointer">
+                    <option value="All">All Cities</option>
+                </select>
+            </div>
+        </div>
 
-                <!-- Chart 1: Industry Breakdown -->
+        <!-- Main Data Table -->
+        <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider w-16">Action</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-indigo-600" onclick="sortTable('name')">Company <i class="fas fa-sort ml-1"></i></th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">CEO / Lead</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Series B</th>
+                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Problem Area</th>
+                            <th scope="col" class="hidden lg:table-cell px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Location</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-200 bg-white">
+                        <!-- Rows injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
+                <span id="recordCount">Showing 0 companies</span>
+                <span>Sorted by Momentum</span>
+            </div>
+        </div>
 
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col">
+    </main>
 
-                    <h3 class="text-sm font-medium text-slate-700 mb-4">Total Funding by Industry</h3>
+    <!-- The "Dossier" Modal -->
+    <div id="dossierModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-slate-900/75 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
 
-                    <div class="chart-container flex-grow">
-
-                        <canvas id="industryChart"></canvas>
-
+        <!-- Panel -->
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-2xl border border-slate-200">
+                    
+                    <!-- Header -->
+                    <div class="bg-indigo-600 px-6 py-6 sm:px-8">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <h3 class="text-2xl font-semibold leading-6 text-white" id="modal-company-name">Company Name</h3>
+                                <p class="mt-2 text-indigo-100 text-sm" id="modal-company-desc">Company Description</p>
+                            </div>
+                            <button type="button" class="rounded-md text-indigo-200 hover:text-white focus:outline-none" onclick="closeModal()">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
                     </div>
 
-                </div>
-
-
-
-                <!-- Chart 2: Location Split -->
-
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col">
-
-                    <h3 class="text-sm font-medium text-slate-700 mb-4">Headquarters Distribution</h3>
-
-                    <div class="chart-container flex-grow">
-
-                        <canvas id="locationChart"></canvas>
-
-                    </div>
-
-                </div>
-
-
-
-                <!-- Chart 3: Deal Velocity (Simulated Year) -->
-
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col">
-
-                    <h3 class="text-sm font-medium text-slate-700 mb-4">Avg. Deal Size ($M)</h3>
-
-                    <div class="chart-container flex-grow">
-
-                        <canvas id="dealSizeChart"></canvas>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- Interactive Data Section -->
-
-        <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-
-            
-
-            <!-- Controls Toolbar -->
-
-            <div class="p-5 border-b border-slate-200 bg-slate-50/50 flex flex-col lg:flex-row gap-4 justify-between items-center">
-
-                <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-
-                    <!-- Search -->
-
-                    <div class="relative w-full sm:w-64">
-
-                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-
-                            <i class="fas fa-search text-slate-400"></i>
-
+                    <!-- Body -->
+                    <div class="px-6 py-6 sm:px-8 bg-white">
+                        
+                        <!-- CEO Contact Block -->
+                        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 mb-6 flex flex-col sm:flex-row gap-5 items-start sm:items-center">
+                            <div class="bg-white p-3 rounded-full border border-slate-200 shadow-sm text-slate-400">
+                                <i class="fas fa-user-tie text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Target Decision Maker</p>
+                                <h4 class="text-lg font-bold text-slate-900" id="modal-ceo-name">CEO Name</h4>
+                                <div class="mt-1 flex items-center gap-2">
+                                    <code class="text-sm bg-indigo-50 text-indigo-700 px-2 py-1 rounded border border-indigo-100" id="modal-ceo-email">email@pattern.com</code>
+                                    <button class="text-slate-400 hover:text-indigo-600 transition-colors text-xs" onclick="copyToClipboard('modal-ceo-email')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-[10px] text-slate-400 mt-1 italic">*Email based on common patterns (e.g., first@domain.com). Verify before sending.</p>
+                            </div>
                         </div>
 
-                        <input type="text" id="searchInput" class="block w-full rounded-md border-0 py-2 pl-10 text-slate-900 ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Search company or investor...">
+                        <!-- The Pitch Block -->
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <p class="text-xs font-bold text-amber-600 uppercase tracking-wider">
+                                    <i class="fas fa-lightbulb mr-1"></i> Suggested Outreach Hook
+                                </p>
+                                <button class="text-xs text-indigo-600 hover:text-indigo-800 font-medium" onclick="copyToClipboard('modal-pitch')">
+                                    Copy Script
+                                </button>
+                            </div>
+                            <div class="bg-amber-50 rounded-xl p-5 border border-amber-200 relative group">
+                                <i class="fas fa-quote-left text-amber-200 text-4xl absolute top-2 left-2 -z-0"></i>
+                                <p class="text-slate-800 text-sm leading-relaxed relative z-10 font-medium" id="modal-pitch">
+                                    Pitch text goes here...
+                                </p>
+                            </div>
+                            <div class="mt-4 text-xs text-slate-500">
+                                <span class="font-bold">Why this works:</span> <span id="modal-rationale">Rationale text...</span>
+                            </div>
+                        </div>
 
                     </div>
 
-                    
-
-                    <!-- Filters -->
-
-                    <select id="industryFilter" class="block w-full sm:w-48 rounded-md border-0 py-2 pl-3 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-
-                        <option value="All">All Industries</option>
-
-                        <!-- Options populated by JS -->
-
-                    </select>
-
-
-
-                    <select id="cityFilter" class="block w-full sm:w-40 rounded-md border-0 py-2 pl-3 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-
-                        <option value="All">All Locations</option>
-
-                        <!-- Options populated by JS -->
-
-                    </select>
-
+                    <!-- Footer -->
+                    <div class="bg-slate-50 px-6 py-4 sm:flex sm:flex-row-reverse sm:px-8 border-t border-slate-200">
+                        <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:mt-0 sm:w-auto" onclick="closeModal()">Close Dossier</button>
+                        <a id="modal-website" href="#" target="_blank" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:mr-3 sm:w-auto">Visit Website</a>
+                    </div>
                 </div>
-
-
-
-                <div class="text-sm text-slate-500 font-medium">
-
-                    Showing <span id="countDisplay" class="text-slate-900">0</span> companies
-
-                </div>
-
             </div>
-
-
-
-            <!-- Table -->
-
-            <div class="overflow-x-auto custom-scrollbar">
-
-                <table class="min-w-full divide-y divide-slate-300">
-
-                    <thead class="bg-slate-50">
-
-                        <tr>
-
-                            <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-indigo-600" onclick="sortTable('name')">Company <i class="fas fa-sort ml-1"></i></th>
-
-                            <th scope="col" class="px-3 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Location</th>
-
-                            <th scope="col" class="px-3 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Industry</th>
-
-                            <th scope="col" class="px-3 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-indigo-600" onclick="sortTable('amount')">Series B ($M) <i class="fas fa-sort ml-1"></i></th>
-
-                            <th scope="col" class="hidden md:table-cell px-3 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Lead Investor</th>
-
-                            <th scope="col" class="px-3 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Description</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="startupsTableBody" class="divide-y divide-slate-200 bg-white">
-
-                        <!-- Rows populated by JS -->
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-            
-
-            <!-- Pagination / Footer of Table -->
-
-            <div class="border-t border-slate-200 px-4 py-3 bg-slate-50 flex justify-center">
-
-                <p class="text-xs text-slate-500">Sorted by relevance and funding momentum.</p>
-
-            </div>
-
-        </section>
-
-        
-
-        <footer class="mt-8 border-t border-slate-200 pt-6 text-center text-xs text-slate-400">
-
-            <p>Sources: Aggregated from Crunchbase, TechCrunch, and SEC Filings (2022-2025). Employee counts are estimates.</p>
-
-            <p class="mt-1">&copy; 2026 VentureScout Analytics.</p>
-
-        </footer>
-
-
-
+        </div>
     </div>
 
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 text-white px-4 py-2 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 text-sm font-medium z-50">
+        Copied to clipboard!
+    </div>
 
-
-    <!-- Application Logic -->
-
+    <!-- Logic -->
     <script>
-
-        // --- DATASET: The "Source Report" Content ---
-
-        // A curated list of ~45 companies fitting the Series B, recent, specific geography criteria.
-
+        // --- ENRICHED DATASET ---
+        // Includes CEO Names, Pattern Emails, and Custom Pitches
         const startupData = [
-
-            { id: 1, name: "Harvey", city: "San Francisco", state: "CA", industry: "AI / Legal", amount: 80, date: "2023", investor: "Sequoia", total: 106, employees: "50-100", desc: "Generative AI platform for elite law firms." },
-
-            { id: 2, name: "Supabase", city: "San Francisco", state: "CA", industry: "DevTools", amount: 80, date: "2022", investor: "Felicis", total: 116, employees: "100-250", desc: "Open source Firebase alternative." },
-
-            { id: 3, name: "Watershed", city: "San Francisco", state: "CA", industry: "Climate", amount: 70, date: "2022", investor: "Sequoia", total: 120, employees: "250-500", desc: "Enterprise carbon footprint measurement." },
-
-            { id: 4, name: "Warp", city: "New York", state: "NY", industry: "DevTools", amount: 50, date: "2023", investor: "Sequoia", total: 73, employees: "50-100", desc: "Rust-based modern terminal." },
-
-            { id: 5, name: "Clay", city: "New York", state: "NY", industry: "SaaS / Sales", amount: 46, date: "2024", investor: "Meritech", total: 62, employees: "50-100", desc: "Automated data enrichment for sales teams." },
-
-            { id: 6, name: "Imbue", city: "San Francisco", state: "CA", industry: "AI / Research", amount: 200, date: "2023", investor: "Astera Institute", total: 220, employees: "50-100", desc: "Building AI agents that can reason and code." },
-
-            { id: 7, name: "Hex", city: "San Francisco", state: "CA", industry: "Data", amount: 52, date: "2022", investor: "a16z", total: 96, employees: "100-250", desc: "Collaborative data science workspace." },
-
-            { id: 8, name: "Vanta", city: "San Francisco", state: "CA", industry: "Security", amount: 110, date: "2022", investor: "Craft Ventures", total: 203, employees: "250-500", desc: "Automated security compliance (SOC2/HIPAA)." },
-
-            { id: 9, name: "Pave", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 100, date: "2022", investor: "Index Ventures", total: 160, employees: "150-300", desc: "Real-time compensation planning data." },
-
-            { id: 10, name: "MotherDuck", city: "Seattle", state: "WA", industry: "Data", amount: 52.5, date: "2023", investor: "Felicis", total: 100, employees: "50-100", desc: "Serverless data analytics with DuckDB." },
-
-            { id: 11, name: "Character.ai", city: "Menlo Park", state: "CA", industry: "AI / Consumer", amount: 150, date: "2023", investor: "a16z", total: 150, employees: "100-250", desc: "Open-ended conversational AI applications." },
-
-            { id: 12, name: "Shield AI", city: "San Diego", state: "CA", industry: "Defense / AI", amount: 165, date: "2022", investor: "Snowpoint", total: 500, employees: "500+", desc: "AI pilot systems for autonomous aircraft." },
-
-            { id: 13, name: "Linear", city: "San Francisco", state: "CA", industry: "DevTools", amount: 35, date: "2023", investor: "Accel", total: 52, employees: "50-100", desc: "Issue tracking built for speed and design." },
-
-            { id: 14, name: "Ampla", city: "New York", state: "NY", industry: "Fintech", amount: 40, date: "2022", investor: "VMG Partners", total: 380, employees: "50-100", desc: "Financial platform for CPG brands." },
-
-            { id: 15, name: "Kin Insurance", city: "Chicago", state: "IL", industry: "Insurtech", amount: 82, date: "2022", investor: "QED Investors", total: 250, employees: "250-500", desc: "Direct-to-consumer home insurance." },
-
-            { id: 16, name: "Chronosphere", city: "New York", state: "NY", industry: "DevOps", amount: 200, date: "2022", investor: "General Atlantic", total: 300, employees: "250-500", desc: "Cloud-native observability platform." },
-
-            { id: 17, name: "Modern Treasury", city: "San Francisco", state: "CA", industry: "Fintech", amount: 85, date: "2022", investor: "Altimeter", total: 133, employees: "100-250", desc: "Payment operations software." },
-
-            { id: 18, name: "Sardine", city: "San Francisco", state: "CA", industry: "Fintech / Fraud", amount: 51.5, date: "2022", investor: "a16z", total: 75, employees: "50-100", desc: "Fraud prevention and compliance platform." },
-
-            { id: 19, name: "Bilt Rewards", city: "New York", state: "NY", industry: "Fintech / Prop", amount: 150, date: "2022", investor: "Left Lane", total: 213, employees: "100-250", desc: "Rewards program for paying rent." },
-
-            { id: 20, name: "Unstructured", city: "San Francisco", state: "CA", industry: "AI / Data", amount: 40, date: "2024", investor: "Menlo", total: 65, employees: "25-50", desc: "ETL for LLMs; unstructured data processing." },
-
-            { id: 21, name: "LangChain", city: "San Francisco", state: "CA", industry: "AI / DevTools", amount: 25, date: "2024", investor: "Sequoia", total: 35, employees: "25-50", desc: "Framework for developing LLM applications." },
-
-            { id: 22, name: "Together AI", city: "San Francisco", state: "CA", industry: "AI / Cloud", amount: 102, date: "2023", investor: "Kleiner Perkins", total: 130, employees: "50-100", desc: "Cloud platform for training generative AI." },
-
-            { id: 23, name: "Chainguard", city: "Seattle", state: "WA", industry: "Security", amount: 61, date: "2023", investor: "Spark Capital", total: 116, employees: "50-100", desc: "Software supply chain security." },
-
-            { id: 24, name: "Neon", city: "San Francisco", state: "CA", industry: "DevTools", amount: 46, date: "2023", investor: "Menlo", total: 104, employees: "50-100", desc: "Serverless Postgres database." },
-
-            { id: 25, name: "Pachama", city: "San Francisco", state: "CA", industry: "Climate", amount: 55, date: "2022", investor: "Future Positive", total: 79, employees: "50-100", desc: "AI-verified forest carbon credits." },
-
-            { id: 26, name: "Regard", city: "Los Angeles", state: "CA", industry: "Health / AI", amount: 30, date: "2024", investor: "Oak HC/FT", total: 50, employees: "50-100", desc: "AI co-pilot for clinicians." },
-
-            { id: 27, name: "Capital", city: "New York", state: "NY", industry: "Fintech", amount: 40, date: "2023", investor: "Founders Fund", total: 50, employees: "50-100", desc: "The founders' bank platform." },
-
-            { id: 28, name: "Owner.com", city: "Palo Alto", state: "CA", industry: "SaaS", amount: 33, date: "2023", investor: "Redpoint", total: 58, employees: "100-250", desc: "All-in-one platform for restaurant owners." },
-
-            { id: 29, name: "EvenUp", city: "San Francisco", state: "CA", industry: "Legal AI", amount: 50, date: "2023", investor: "Bessemer", total: 65, employees: "50-100", desc: "AI for personal injury law claims." },
-
-            { id: 30, name: "Abridge", city: "Pittsburgh/SF", state: "CA", industry: "Health / AI", amount: 150, date: "2024", investor: "Lightspeed", total: 212, employees: "50-100", desc: "Generative AI for medical documentation." },
-
-            { id: 31, name: "Captions", city: "New York", state: "NY", industry: "AI / Media", amount: 60, date: "2024", investor: "Index", total: 100, employees: "25-50", desc: "AI video editing and dubbing app." },
-
-            { id: 32, name: "Statsig", city: "Seattle", state: "WA", industry: "DevTools", amount: 43, date: "2022", investor: "Sequoia", total: 53, employees: "50-100", desc: "Product experimentation platform." },
-
-            { id: 33, name: "KoBold Metals", city: "Berkeley", state: "CA", industry: "Climate / AI", amount: 195, date: "2022", investor: "T. Rowe Price", total: 200, employees: "100-250", desc: "AI for battery mineral exploration." },
-
-            { id: 34, name: "GlossGenius", city: "New York", state: "NY", industry: "SaaS", amount: 28, date: "2023", investor: "L Catterton", total: 70, employees: "100-250", desc: "Booking platform for beauty professionals." },
-
-            { id: 35, name: "Gem", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 100, date: "2021", investor: "ICONIQ", total: 148, employees: "250-500", desc: "Talent engagement platform." },
-
-            { id: 36, name: "Living Carbon", city: "San Francisco", state: "CA", industry: "Climate", amount: 21, date: "2023", investor: "Temasek", total: 36, employees: "50-100", desc: "Genetically enhanced trees for carbon capture." },
-
-            { id: 37, name: "Nano", city: "San Francisco", state: "CA", industry: "Crypto", amount: 30, date: "2023", investor: "Polychain", total: 30, employees: "25-50", desc: "Zero-fee digital currency protocol." },
-
-            { id: 38, name: "Pearl", city: "Los Angeles", state: "CA", industry: "Health / AI", amount: 58, date: "2024", investor: "Left Lane", total: 70, employees: "50-100", desc: "AI dental imaging analysis." },
-
-            { id: 39, name: "Normalyze", city: "San Francisco", state: "CA", industry: "Security", amount: 22, date: "2022", investor: "Lightspeed", total: 26, employees: "25-50", desc: "Data-first cloud security." },
-
-            { id: 40, name: "Project44", city: "Chicago", state: "IL", industry: "Logistics", amount: 202, date: "2021", investor: "Goldman Sachs", total: 800, employees: "500+", desc: "Supply chain visibility platform." },
-
-            { id: 41, name: "Coalesce", city: "San Francisco", state: "CA", industry: "Data", amount: 26, date: "2022", investor: "Emergence", total: 32, employees: "50-100", desc: "Data transformation for Snowflake." },
-
-            { id: 42, name: "Rutter", city: "San Francisco", state: "CA", industry: "Fintech", amount: 27, date: "2022", investor: "a16z", total: 29, employees: "25-50", desc: "Universal API for commerce data." },
-
-            { id: 43, name: "Finch", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 40, date: "2023", investor: "General Catalyst", total: 58, employees: "50-100", desc: "API for payroll and HR systems." },
-
-            { id: 44, name: "Parafin", city: "San Francisco", state: "CA", industry: "Fintech", amount: 60, date: "2022", investor: "GIC", total: 94, employees: "50-100", desc: "Embedded financing infrastructure." },
-
+            { 
+                id: 1, name: "Harvey", city: "San Francisco", state: "CA", industry: "AI / Legal", amount: 80, 
+                ceo: "Gabriel Pereyra", email: "gabriel@harvey.ai", 
+                pitch: "I've been analyzing your recent Series B expansion. Given the high fidelity required in legal AI, I'd love to propose a project to build a 'Citation Verification Layer' that cross-references generated outputs against real-time case law databases to reduce hallucination risks by 40%.",
+                rationale: "Addresses the #1 fear in Legal AI (accuracy).",
+                desc: "Generative AI platform for elite law firms." 
+            },
+            { 
+                id: 2, name: "Supabase", city: "San Francisco", state: "CA", industry: "DevTools", amount: 80, 
+                ceo: "Paul Copplestone", email: "paul@supabase.com", 
+                pitch: "Huge fan of the open source approach. I noticed many users struggle with complex Row Level Security policies. I'd like to build a visual 'RLS Policy Simulator' that allows devs to test permission rules before deploying, reducing misconfiguration support tickets.",
+                rationale: "Solves a specific technical pain point for their user base.",
+                desc: "Open source Firebase alternative." 
+            },
+            { 
+                id: 3, name: "Watershed", city: "San Francisco", state: "CA", industry: "Climate", amount: 70, 
+                ceo: "Taylor Francis", email: "taylor@watershed.com", 
+                pitch: "With new SEC climate disclosure rules looming, your enterprise clients need granularity. I propose building a 'Scope 3 Supplier Portal' that gamifies data entry for downstream suppliers, improving data completion rates for your large enterprise customers.",
+                rationale: "Timely regulatory hook + user engagement solution.",
+                desc: "Enterprise carbon footprint measurement." 
+            },
+            { 
+                id: 4, name: "Warp", city: "New York", state: "NY", industry: "DevTools", amount: 50, 
+                ceo: "Zach Lloyd", email: "zach@warp.dev", 
+                pitch: "Warp is fast, but onboarding traditional terminal users is friction. I can design an interactive 'Command Migration Wizard' that analyzes a user's .bashrc/.zshrc and automatically suggests Warp-equivalent workflows and keybindings.",
+                rationale: "Reduces friction in adoption/onboarding.",
+                desc: "Rust-based modern terminal." 
+            },
+            { 
+                id: 5, name: "Clay", city: "New York", state: "NY", industry: "SaaS / Sales", amount: 46, 
+                ceo: "Kareem Amin", email: "kareem@clay.com", 
+                pitch: "Clay excels at enrichment. I'd love to build a 'Signal Scraper Template' specifically for finding companies hiring for specific tech stacks (e.g., finding everyone using Snowflake but not dbt), to create a new high-intent template for your library.",
+                rationale: "Adds content/value to their platform ecosystem.",
+                desc: "Automated data enrichment for sales teams." 
+            },
+            { 
+                id: 6, name: "Imbue", city: "San Francisco", state: "CA", industry: "AI / Research", amount: 200, 
+                ceo: "Kanjun Qiu", email: "kanjun@imbue.com", 
+                pitch: "Reasoning agents need better debugging tools. I propose a 'Logic Trace Visualizer' that maps out the chain-of-thought steps your agents take, allowing researchers to pinpoint exactly where a reasoning path diverged from the optimal.",
+                rationale: "Highly technical tool for a research-focused team.",
+                desc: "Building AI agents that can reason and code." 
+            },
+            { 
+                id: 7, name: "Hex", city: "San Francisco", state: "CA", industry: "Data", amount: 52, 
+                ceo: "Barry McCardel", email: "barry@hex.tech", 
+                pitch: "Hex bridges notebooks and apps. I want to build a 'Component Library' for Hex that offers pre-styled, mobile-responsive UI widgets for data apps, making reports look like native products on executives' phones.",
+                rationale: "Improves the end-consumption experience of their product.",
+                desc: "Collaborative data science workspace." 
+            },
+            { 
+                id: 8, name: "Vanta", city: "San Francisco", state: "CA", industry: "Security", amount: 110, 
+                ceo: "Christina Cacioppo", email: "christina@vanta.com", 
+                pitch: "Compliance is dry. I propose a 'Compliance Health Widget' that sits in a client's internal Slack/Teams, pinging employees with fun, gamified reminders to complete background checks or policy acceptances, boosting compliance speed.",
+                rationale: "Employee engagement is the bottleneck in compliance.",
+                desc: "Automated security compliance (SOC2/HIPAA)." 
+            },
+            { 
+                id: 9, name: "Pave", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 100, 
+                ceo: "Matt Schulman", email: "matt@pave.com", 
+                pitch: "Compensation transparency is trending. I can build a public-facing 'Salary Band Calculator' widget that Pave customers can embed on their careers pages, driven by your API, to drive inbound leads and show off your data assets.",
+                rationale: "Marketing asset that utilizes their core data.",
+                desc: "Real-time compensation planning data." 
+            },
+            { 
+                id: 10, name: "MotherDuck", city: "Seattle", state: "WA", industry: "Data", amount: 52.5, 
+                ceo: "Jordan Tigani", email: "jordan@motherduck.com", 
+                pitch: "Serverless DuckDB is a game changer. I'd like to write a technical content series and build a demo app showing 'Zero-Latency Dashboards' running entirely in the browser using WASM + MotherDuck, targeting frontend devs who hate backend complexity.",
+                rationale: "DevRel / Content marketing project.",
+                desc: "Serverless data analytics with DuckDB." 
+            },
+            { 
+                id: 11, name: "Character.ai", city: "Menlo Park", state: "CA", industry: "AI / Consumer", amount: 150, 
+                ceo: "Noam Shazeer", email: "noam@character.ai", 
+                pitch: "Retention in consumer AI relies on memory. I propose designing a 'Long-Term Memory Dashboard' for users, where they can see and edit the key facts their characters remember about them, giving users control over the relationship context.",
+                rationale: "User feature enhancing personalization and retention.",
+                desc: "Open-ended conversational AI applications." 
+            },
+            { 
+                id: 12, name: "Shield AI", city: "San Diego", state: "CA", industry: "Defense / AI", amount: 165, 
+                ceo: "Ryan Tseng", email: "ryan@shield.ai", 
+                pitch: "Given the complexity of Hivemind, I propose building a 'Simulation Replay Tool' that allows operators to review autonomous flight decisions in a 3D web-based environment for after-action reviews.",
+                rationale: "Operational tool for their specific hardware/software loop.",
+                desc: "AI pilot systems for autonomous aircraft." 
+            },
+            { 
+                id: 13, name: "Linear", city: "San Francisco", state: "CA", industry: "DevTools", amount: 35, 
+                ceo: "Karri Saarinen", email: "karri@linear.app", 
+                pitch: "Linear is the gold standard for design. I'd love to build a 'Linear Insights' plugin that visualizes team velocity using Tufte-style minimalist sparklines directly in the sidebar, matching your rigorous design aesthetic.",
+                rationale: "Aesthetic alignment is key for pitching Linear.",
+                desc: "Issue tracking built for speed and design." 
+            },
+            { 
+                id: 14, name: "Ampla", city: "New York", state: "NY", industry: "Fintech", amount: 40, 
+                ceo: "Anthony Santomo", email: "anthony@getampla.com", 
+                pitch: "CPG brands struggle with inventory forecasting. I propose a 'Cash Flow Predictor' module that overlays inventory purchase requirements on top of their credit limit visualization to prevent stockouts.",
+                rationale: "Solves a specific financial pain point for CPG customers.",
+                desc: "Financial platform for CPG brands." 
+            },
+            { 
+                id: 15, name: "Kin Insurance", city: "Chicago", state: "IL", industry: "Insurtech", amount: 82, 
+                ceo: "Sean Harper", email: "sean@kin.com", 
+                pitch: "Homeowners in high-risk areas need reassurance. I propose a 'Climate Risk Shield' dashboard for policyholders that shows live weather data overlaying their property and specific mitigation tips to lower their premiums.",
+                rationale: "Customer education + churn reduction.",
+                desc: "Direct-to-consumer home insurance." 
+            },
+            { 
+                id: 16, name: "Chronosphere", city: "New York", state: "NY", industry: "DevOps", amount: 200, 
+                ceo: "Martin Mao", email: "martin@chronosphere.io", 
+                pitch: "Cloud costs for observability are skyrocketing. I'd like to build a 'Metric Cardinality Auditor' tool that scans incoming data streams and identifies high-cost, low-value metrics that can be dropped to save money.",
+                rationale: "Cost-optimization is the #1 sell in DevOps right now.",
+                desc: "Cloud-native observability platform." 
+            },
+            { 
+                id: 17, name: "Modern Treasury", city: "San Francisco", state: "CA", industry: "Fintech", amount: 85, 
+                ceo: "Dimitri Dadiomov", email: "dimitri@moderntreasury.com", 
+                pitch: "Reconciliation is painful. I propose building a 'Transaction Matcher UI' that uses fuzzy logic to suggest matches for orphaned ledger entries, speeding up the month-end close for your customers' finance teams.",
+                rationale: "Operational efficiency tool.",
+                desc: "Payment operations software." 
+            },
+            { 
+                id: 18, name: "Sardine", city: "San Francisco", state: "CA", industry: "Fintech / Fraud", amount: 51.5, 
+                ceo: "Soups Ranjan", email: "soups@sardine.ai", 
+                pitch: "Fraud vectors change daily. I'd like to create a 'Live Threat Map' visualization for your marketing site that shows anonymized, real-time fraud attempts being blocked globally, demonstrating the scale of your protection.",
+                rationale: "Powerful sales/marketing asset.",
+                desc: "Fraud prevention and compliance platform." 
+            },
+            { 
+                id: 19, name: "Bilt Rewards", city: "New York", state: "NY", industry: "Fintech / Prop", amount: 150, 
+                ceo: "Ankur Jain", email: "ankur@biltrewards.com", 
+                pitch: "Engagement drops between rent payments. I propose a 'Neighborhood Discovery' feature in the app that allows users to earn extra points by visiting local Bilt-affiliated coffee shops/gyms, increasing daily active usage.",
+                rationale: "Increases DAU (Daily Active Users).",
+                desc: "Rewards program for paying rent." 
+            },
+            { 
+                id: 20, name: "Unstructured", city: "San Francisco", state: "CA", industry: "AI / Data", amount: 40, 
+                ceo: "Brian Raymond", email: "brian@unstructured.io", 
+                pitch: "PDF tables are a nightmare for RAG. I want to build a specific open-source benchmarking tool that compares Unstructured's performance on complex financial tables against competitors, creating a definitive 'Why Us' technical asset.",
+                rationale: "Technical marketing/proof of superiority.",
+                desc: "ETL for LLMs; unstructured data processing." 
+            },
+            { 
+                id: 21, name: "LangChain", city: "San Francisco", state: "CA", industry: "AI / DevTools", amount: 25, 
+                ceo: "Harrison Chase", email: "harrison@langchain.com", 
+                pitch: "The ecosystem is moving fast. I propose creating a 'Blueprint Gallery'—a visual marketplace of pre-built, community-verified LangGraph architectures that new developers can clone and deploy in one click.",
+                rationale: "Community enablement/adoption driver.",
+                desc: "Framework for developing LLM applications." 
+            },
+            { 
+                id: 22, name: "Together AI", city: "San Francisco", state: "CA", industry: "AI / Cloud", amount: 102, 
+                ceo: "Vipul Ved Prakash", email: "vipul@together.xyz", 
+                pitch: "Fine-tuning is complex. I'd like to design a 'Training Cost Calculator' that lets users input their dataset size and model choice to estimate the exact cost and time to fine-tune, removing pricing ambiguity for enterprise leads.",
+                rationale: "Sales enablement tool.",
+                desc: "Cloud platform for training generative AI." 
+            },
+            { 
+                id: 23, name: "Chainguard", city: "Seattle", state: "WA", industry: "Security", amount: 61, 
+                ceo: "Dan Lorenc", email: "dan@chainguard.dev", 
+                pitch: "CVE fatigue is real. I propose building a 'Vulnerability Impact Graph' that visualizes exactly which parts of a customer's production cluster would be affected by a specific CVE, prioritizing fixes based on actual runtime exposure.",
+                rationale: "Prioritization tool for security teams.",
+                desc: "Software supply chain security." 
+            },
+            { 
+                id: 24, name: "Neon", city: "San Francisco", state: "CA", industry: "DevTools", amount: 46, 
+                ceo: "Nikita Shamgunov", email: "nikita@neon.tech", 
+                pitch: "Database branching is your superpower. I want to build a 'CI/CD Preview' integration that automatically spins up a Neon branch for every GitHub Pull Request and tears it down after merge, demonstrating instant ephemeral environments.",
+                rationale: "Integrations drive adoption.",
+                desc: "Serverless Postgres database." 
+            },
+            { 
+                id: 25, name: "Pachama", city: "San Francisco", state: "CA", industry: "Climate", amount: 55, 
+                ceo: "Diego Saez Gil", email: "diego@pachama.com", 
+                pitch: "Trust is the currency in carbon markets. I propose an 'Interactive Forest Flyover' feature using WebGL that lets corporate buyers virtually fly through the specific forest plots they are funding, visualizing LiDAR data.",
+                rationale: "High-end visual trust-building.",
+                desc: "AI-verified forest carbon credits." 
+            },
+            { 
+                id: 26, name: "Regard", city: "Los Angeles", state: "CA", industry: "Health / AI", amount: 30, 
+                ceo: "Eli Ben-Joseph", email: "eli@withregard.com", 
+                pitch: "Clinician burnout is the enemy. I'd love to design a 'Time-Saved Ticker' for hospital admins that calculates live ROI based on hours of documentation automated, helping you upsell to hospital CFOs.",
+                rationale: "ROI visualization for B2B sales.",
+                desc: "AI co-pilot for clinicians." 
+            },
+            { 
+                id: 27, name: "Capital", city: "New York", state: "NY", industry: "Fintech", amount: 40, 
+                ceo: "Ryan Caldbeck", email: "ryan@capital.xyz", 
+                pitch: "Founders need community. I propose building a 'Founder Insight Network' within the dashboard where customers can anonymously benchmark their burn rates and CAC against other startups in your network.",
+                rationale: "Community/Network effect feature.",
+                desc: "The founders' bank platform." 
+            },
+            { 
+                id: 28, name: "Owner.com", city: "Palo Alto", state: "CA", industry: "SaaS", amount: 33, 
+                ceo: "Adam Guild", email: "adam@owner.com", 
+                pitch: "Restaurants are busy. I can design a 'Mobile Command Center' specifically for restaurant GMs that condenses all daily operational metrics (orders, reviews, marketing) into a single-thumb feed.",
+                rationale: "Mobile-first UX for non-desk workers.",
+                desc: "All-in-one platform for restaurant owners." 
+            },
+            { 
+                id: 29, name: "EvenUp", city: "San Francisco", state: "CA", industry: "Legal AI", amount: 50, 
+                ceo: "Rami Karabibar", email: "rami@evenup.ai", 
+                pitch: "Demand packages are story-driven. I propose a 'Narrative Arc Builder' feature that helps paralegals structure the medical facts into a compelling chronological story for the claim, rather than just a list of facts.",
+                rationale: "UX improvement for their core workflow.",
+                desc: "AI for personal injury law claims." 
+            },
+            { 
+                id: 30, name: "Abridge", city: "Pittsburgh/SF", state: "CA", industry: "Health / AI", amount: 150, 
+                ceo: "Shiv Rao", email: "shiv@abridge.com", 
+                pitch: "Patient trust is paramount. I'd like to design a 'Patient Recap View'—a simplified, jargon-free summary generated from the consult that doctors can hand to patients, improving adherence and patient satisfaction scores.",
+                rationale: "Extends value from doctor to patient.",
+                desc: "Generative AI for medical documentation." 
+            },
+            { 
+                id: 31, name: "Captions", city: "New York", state: "NY", industry: "AI / Media", amount: 60, 
+                ceo: "Gaurav Misra", email: "gaurav@captions.ai", 
+                pitch: "Creators need viral hooks. I propose a 'Trend Jacker' feature that analyzes trending audio on TikTok/Reels and suggests AI editing templates that fit those current trends.",
+                rationale: "Growth hacking feature for their users.",
+                desc: "AI video editing and dubbing app." 
+            },
+            { 
+                id: 32, name: "Statsig", city: "Seattle", state: "WA", industry: "DevTools", amount: 43, 
+                ceo: "Vijaye Raji", email: "vijaye@statsig.com", 
+                pitch: "Experimentation culture is hard to build. I'd like to build a 'Win Rate Dashboard' that gamifies experiment results for product teams, celebrating 'Learning Moments' (failed experiments) to encourage more testing.",
+                rationale: "Cultural tool to drive product stickiness.",
+                desc: "Product experimentation platform." 
+            },
+            { 
+                id: 33, name: "KoBold Metals", city: "Berkeley", state: "CA", industry: "Climate / AI", amount: 195, 
+                ceo: "Kurt House", email: "kurt@koboldmetals.com", 
+                pitch: "Exploration is opaque. I propose creating a 'Discovery Timeline' interactive map for your public relations that visualizes the journey from AI prediction to physical drilling results, demystifying your tech for investors.",
+                rationale: "Public relations / Investor relations asset.",
+                desc: "AI for battery mineral exploration." 
+            },
+            { 
+                id: 34, name: "GlossGenius", city: "New York", state: "NY", industry: "SaaS", amount: 28, 
+                ceo: "Danielle Cohen-Shohet", email: "danielle@glossgenius.com", 
+                pitch: "Style is visual. I propose a 'Portfolio Builder' that auto-generates a high-end personal website for stylists based on their Instagram feed, locking them into the GlossGenius ecosystem.",
+                rationale: "Ecosystem lock-in feature.",
+                desc: "Booking platform for beauty professionals." 
+            },
+            { 
+                id: 35, name: "Gem", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 100, 
+                ceo: "Steve Bartel", email: "steve@gem.com", 
+                pitch: "Recruiters live in LinkedIn. I'd like to optimize your Chrome Extension UI to load 50% faster and include a 'One-Click Personalized Outreach' generator based on the candidate's GitHub/StackOverflow activity.",
+                rationale: "Core workflow optimization.",
+                desc: "Talent engagement platform." 
+            },
+            { 
+                id: 36, name: "Living Carbon", city: "San Francisco", state: "CA", industry: "Climate", amount: 21, 
+                ceo: "Maddie Hall", email: "maddie@livingcarbon.com", 
+                pitch: "Genetics is abstract. I propose a 'Growth Simulator' web app where landowners can input their soil type and climate to see a simulation of how much faster your enhanced trees will grow compared to standard stock.",
+                rationale: "Sales tool for landowners.",
+                desc: "Genetically enhanced trees for carbon capture." 
+            },
+            { 
+                id: 37, name: "Nano", city: "San Francisco", state: "CA", industry: "Crypto", amount: 30, 
+                ceo: "Beniamin Mincu", email: "beniamin@nano.org", 
+                pitch: "Crypto UX is usually bad. I propose designing a 'Gasless Onboarding Flow' that abstracts away all wallet complexity for first-time users, using passkeys instead of seed phrases.",
+                rationale: "UX overhaul for mass adoption.",
+                desc: "Zero-fee digital currency protocol." 
+            },
+            { 
+                id: 38, name: "Pearl", city: "Los Angeles", state: "CA", industry: "Health / AI", amount: 58, 
+                ceo: "Ophir Tanz", email: "ophir@hellopearl.com", 
+                pitch: "Dentists need to explain diagnoses. I'd like to build an 'Interactive Tooth Map' for the patient display that lights up detected cavities in red and healthy areas in green, making treatment acceptance a no-brainer.",
+                rationale: "Sales aid for their B2B customers (dentists).",
+                desc: "AI dental imaging analysis." 
+            },
+            { 
+                id: 39, name: "Normalyze", city: "San Francisco", state: "CA", industry: "Security", amount: 22, 
+                ceo: "Amer Deeba", email: "amer@normalyze.ai", 
+                pitch: "Data sprawl is the issue. I propose a 'Shadow Data Discovery' tool that scans a prospect's AWS environment and generates a 'Shock Report' showing exactly how much sensitive data is currently exposed, as a lead magnet.",
+                rationale: "Lead generation magnet.",
+                desc: "Data-first cloud security." 
+            },
+            { 
+                id: 40, name: "Project44", city: "Chicago", state: "IL", industry: "Logistics", amount: 202, 
+                ceo: "Jett McCandless", email: "jett@project44.com", 
+                pitch: "Supply chains are chaotic. I'd like to build a 'Delay Impact Calculator' that helps logistics managers quantify the dollar cost of a specific port strike or delay, helping them justify the cost of your premium visibility tools.",
+                rationale: "ROI calculator for enterprise sales.",
+                desc: "Supply chain visibility platform." 
+            },
+            { 
+                id: 41, name: "Coalesce", city: "San Francisco", state: "CA", industry: "Data", amount: 26, 
+                ceo: "Armon Petrossian", email: "armon@coalesce.io", 
+                pitch: "Data lineage is complex. I propose a 'Column-Level Lineage Explorer' that allows data engineers to click any dashboard metric and trace it all the way back to the raw source table in Snowflake visually.",
+                rationale: "Deep technical feature for data engineers.",
+                desc: "Data transformation for Snowflake." 
+            },
+            { 
+                id: 42, name: "Rutter", city: "San Francisco", state: "CA", industry: "Fintech", amount: 27, 
+                ceo: "Peter Zhou", email: "peter@rutterapi.com", 
+                pitch: "Universal APIs need great docs. I want to build an 'Interactive API Playground' that lets developers make live test calls to your Commerce API without writing a single line of code, increasing conversion to API key generation.",
+                rationale: "Developer experience (DX) improvement.",
+                desc: "Universal API for commerce data." 
+            },
+            { 
+                id: 43, name: "Finch", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 40, 
+                ceo: "Jeremy Zhang", email: "jeremy@tryfinch.com", 
+                pitch: "Payroll integration is scary. I propose building a 'Security Compliance Center' within your docs that proactively answers every question a prospect's CISO will ask about data handling, shortening sales cycles.",
+                rationale: "Sales cycle acceleration.",
+                desc: "API for payroll and HR systems." 
+            },
+            { 
+                id: 44, name: "Parafin", city: "San Francisco", state: "CA", industry: "Fintech", amount: 60, 
+                ceo: "Sahill Poddar", email: "sahill@parafin.com", 
+                pitch: "Capital offers need to be timely. I propose a 'Seasonality Predictor' that analyzes a merchant's historical transaction data to suggest the exact week they will need capital for inventory, triggering proactive offers.",
+                rationale: "AI/Data feature to drive loan volume.",
+                desc: "Embedded financing infrastructure." 
+            }
         ];
 
-
-
-        // --- APP STATE ---
-
+        // --- STATE MANAGEMENT ---
         let state = {
-
             data: [...startupData],
-
             filterIndustry: 'All',
-
             filterCity: 'All',
-
             searchQuery: '',
-
-            sortField: 'amount', // 'amount', 'name'
-
-            sortOrder: 'desc' // 'desc', 'asc'
-
+            sortField: 'amount',
+            sortOrder: 'desc'
         };
 
-
-
-        // --- INITIALIZATION ---
-
+        // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
-
             populateDropdowns();
-
-            renderKPIs();
-
             renderCharts();
-
             renderTable();
 
-            
-
-            // Event Listeners
-
+            // Inputs
             document.getElementById('searchInput').addEventListener('input', (e) => {
-
                 state.searchQuery = e.target.value.toLowerCase();
-
                 filterData();
-
             });
-
-            
-
             document.getElementById('industryFilter').addEventListener('change', (e) => {
-
                 state.filterIndustry = e.target.value;
-
                 filterData();
-
             });
-
-            
-
             document.getElementById('cityFilter').addEventListener('change', (e) => {
-
                 state.filterCity = e.target.value;
-
                 filterData();
-
             });
-
         });
 
-
-
-        // --- CORE LOGIC ---
-
-        
-
+        // --- CORE FUNCTIONS ---
         function populateDropdowns() {
-
             const industries = [...new Set(startupData.map(d => d.industry))].sort();
-
             const cities = [...new Set(startupData.map(d => d.city))].sort();
-
             
-
-            const indSelect = document.getElementById('industryFilter');
-
-            const citySelect = document.getElementById('cityFilter');
-
-            
-
-            industries.forEach(ind => {
-
+            industries.forEach(i => {
                 const opt = document.createElement('option');
-
-                opt.value = ind;
-
-                opt.textContent = ind;
-
-                indSelect.appendChild(opt);
-
+                opt.value = i; opt.textContent = i;
+                document.getElementById('industryFilter').appendChild(opt);
             });
-
-            
-
-            cities.forEach(city => {
-
+            cities.forEach(c => {
                 const opt = document.createElement('option');
-
-                opt.value = city;
-
-                opt.textContent = city;
-
-                citySelect.appendChild(opt);
-
+                opt.value = c; opt.textContent = c;
+                document.getElementById('cityFilter').appendChild(opt);
             });
-
         }
-
-
 
         function filterData() {
-
-            state.data = startupData.filter(item => {
-
-                const matchSearch = item.name.toLowerCase().includes(state.searchQuery) || 
-
-                                    item.investor.toLowerCase().includes(state.searchQuery) ||
-
-                                    item.desc.toLowerCase().includes(state.searchQuery);
-
-                const matchInd = state.filterIndustry === 'All' || item.industry === state.filterIndustry;
-
-                const matchCity = state.filterCity === 'All' || item.city === state.filterCity;
-
-                return matchSearch && matchInd && matchCity;
-
+            state.data = startupData.filter(d => {
+                const search = state.searchQuery;
+                const matchText = d.name.toLowerCase().includes(search) || 
+                                  d.ceo.toLowerCase().includes(search) || 
+                                  d.industry.toLowerCase().includes(search);
+                const matchInd = state.filterIndustry === 'All' || d.industry === state.filterIndustry;
+                const matchCity = state.filterCity === 'All' || d.city === state.filterCity;
+                return matchText && matchInd && matchCity;
             });
-
-            
-
-            // Re-sort after filter
-
             sortDataInternal();
-
-            
-
-            updateUI();
-
+            renderTable();
+            document.getElementById('recordCount').innerText = `Showing ${state.data.length} companies`;
         }
-
-        
 
         function sortTable(field) {
-
-            // Toggle order if clicking same field
-
             if (state.sortField === field) {
-
                 state.sortOrder = state.sortOrder === 'desc' ? 'asc' : 'desc';
-
             } else {
-
                 state.sortField = field;
-
-                state.sortOrder = 'desc'; // Default to high-to-low for new fields
-
+                state.sortOrder = 'desc';
             }
-
-            
-
             sortDataInternal();
-
-            updateUI();
-
+            renderTable();
         }
-
-        
 
         function sortDataInternal() {
-
             state.data.sort((a, b) => {
-
-                let valA = a[state.sortField];
-
-                let valB = b[state.sortField];
-
+                let va = a[state.sortField];
+                let vb = b[state.sortField];
+                if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); }
                 
-
-                if (typeof valA === 'string') valA = valA.toLowerCase();
-
-                if (typeof valB === 'string') valB = valB.toLowerCase();
-
-                
-
-                if (valA < valB) return state.sortOrder === 'asc' ? -1 : 1;
-
-                if (valA > valB) return state.sortOrder === 'asc' ? 1 : -1;
-
+                if (va < vb) return state.sortOrder === 'asc' ? -1 : 1;
+                if (va > vb) return state.sortOrder === 'asc' ? 1 : -1;
                 return 0;
-
             });
-
         }
 
-
-
-        function updateUI() {
-
-            renderTable();
-
-            renderKPIs();
-
-            renderCharts(); // Re-render charts with filtered data
-
-        }
-
-
-
-        // --- RENDERING ---
-
-
-
-        function renderKPIs() {
-
-            const kpiContainer = document.getElementById('kpi-section');
-
-            const totalFunding = state.data.reduce((acc, curr) => acc + curr.amount, 0);
-
-            const avgFunding = state.data.length > 0 ? (totalFunding / state.data.length).toFixed(1) : 0;
-
-            const uniqueInvestors = new Set(state.data.map(d => d.investor)).size;
-
-            
-
-            // Icons map
-
-            const cards = [
-
-                { label: "Companies Tracked", value: state.data.length, icon: "fa-building", color: "text-blue-600", bg: "bg-blue-50" },
-
-                { label: "Total Series B Vol", value: `$${(totalFunding/1000).toFixed(2)}B`, icon: "fa-money-bill-wave", color: "text-emerald-600", bg: "bg-emerald-50" },
-
-                { label: "Avg Round Size", value: `$${avgFunding}M`, icon: "fa-chart-line", color: "text-indigo-600", bg: "bg-indigo-50" },
-
-                { label: "Active Investors", value: uniqueInvestors, icon: "fa-handshake", color: "text-amber-600", bg: "bg-amber-50" }
-
-            ];
-
-
-
-            kpiContainer.innerHTML = cards.map(card => `
-
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex items-center transition-all-300 hover:shadow-md">
-
-                    <div class="flex-shrink-0 p-3 rounded-lg ${card.bg} ${card.color}">
-
-                        <i class="fas ${card.icon} text-xl"></i>
-
-                    </div>
-
-                    <div class="ml-4">
-
-                        <p class="text-sm font-medium text-slate-500">${card.label}</p>
-
-                        <p class="text-2xl font-bold text-slate-900">${card.value}</p>
-
-                    </div>
-
-                </div>
-
-            `).join('');
-
-            
-
-            document.getElementById('countDisplay').innerText = state.data.length;
-
-        }
-
-
-
+        // --- RENDER TABLE ---
         function renderTable() {
-
-            const tbody = document.getElementById('startupsTableBody');
-
+            const tbody = document.getElementById('tableBody');
             if (state.data.length === 0) {
-
-                tbody.innerHTML = `<tr><td colspan="6" class="px-3 py-8 text-center text-slate-500">No companies found matching your filters.</td></tr>`;
-
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">No results found.</td></tr>`;
                 return;
-
             }
-
-
 
             tbody.innerHTML = state.data.map(item => `
-
-                <tr class="hover:bg-slate-50 transition-colors">
-
-                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm">
-
-                        <div class="font-medium text-slate-900">${item.name}</div>
-
-                        <div class="text-xs text-slate-400 mt-0.5">${item.employees} employees</div>
-
+                <tr class="hover:bg-slate-50 transition-colors group">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <button onclick="openModal(${item.id})" class="bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-600 rounded-full w-8 h-8 flex items-center justify-center transition-all shadow-sm ring-1 ring-indigo-200">
+                            <i class="fas fa-key text-xs"></i>
+                        </button>
                     </td>
-
-                    <td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500">
-
-                        ${item.city}, ${item.state}
-
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="font-bold text-slate-900">${item.name}</div>
+                        <div class="text-xs text-slate-400">${item.industry}</div>
                     </td>
-
-                    <td class="whitespace-nowrap px-3 py-4 text-sm">
-
-                        <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-500/10">
-
-                            ${item.industry}
-
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-slate-700">${item.ceo}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            $${item.amount}M
                         </span>
-
                     </td>
-
-                    <td class="whitespace-nowrap px-3 py-4 text-sm text-right font-medium text-emerald-700">
-
-                        $${item.amount}M
-
+                    <td class="px-6 py-4 text-sm text-slate-500 max-w-xs truncate">
+                        ${item.rationale}
                     </td>
-
-                    <td class="hidden md:table-cell whitespace-nowrap px-3 py-4 text-sm text-slate-500">
-
-                        ${item.investor}
-
+                    <td class="hidden lg:table-cell px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                        ${item.city}, ${item.state}
                     </td>
-
-                    <td class="px-3 py-4 text-sm text-slate-500 max-w-xs truncate" title="${item.desc}">
-
-                        ${item.desc}
-
-                    </td>
-
                 </tr>
-
             `).join('');
-
         }
 
+        // --- MODAL LOGIC ---
+        function openModal(id) {
+            const item = startupData.find(d => d.id === id);
+            if (!item) return;
 
+            document.getElementById('modal-company-name').innerText = item.name;
+            document.getElementById('modal-company-desc').innerText = item.desc;
+            document.getElementById('modal-ceo-name').innerText = item.ceo;
+            document.getElementById('modal-ceo-email').innerText = item.email;
+            document.getElementById('modal-pitch').innerText = item.pitch;
+            document.getElementById('modal-rationale').innerText = item.rationale;
+            document.getElementById('modal-website').href = `https://www.google.com/search?q=${item.name}+startup`; // Fallback to search
+
+            const modal = document.getElementById('dossierModal');
+            modal.classList.remove('hidden');
+            // Small timeout to allow display:block to apply before adding opacity class
+            setTimeout(() => {
+                modal.querySelector('.bg-slate-900\\/75').classList.add('opacity-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('dossierModal');
+            modal.querySelector('.bg-slate-900\\/75').classList.remove('opacity-100');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.getElementById('toast');
+                toast.classList.remove('opacity-0', 'translate-y-20');
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'translate-y-20');
+                }, 2000);
+            });
+        }
 
         // --- CHARTS ---
-
-        
-
-        let charts = {};
-
-
-
         function renderCharts() {
-
-            // Prepare Data
-
+            // Industry Chart
+            const inds = {};
+            startupData.forEach(d => { 
+                const k = d.industry.split(' / ')[0]; 
+                inds[k] = (inds[k] || 0) + d.amount; 
+            });
+            const topInds = Object.entries(inds).sort((a,b) => b[1]-a[1]).slice(0,5);
             
-
-            // 1. Industry (Top 5 + Others)
-
-            const indCounts = {};
-
-            state.data.forEach(d => {
-
-                // Simplified industry grouping for chart
-
-                let key = d.industry.split(' / ')[0]; 
-
-                indCounts[key] = (indCounts[key] || 0) + d.amount; // Summing funding amount
-
-            });
-
-            const sortedInd = Object.entries(indCounts).sort((a,b) => b[1] - a[1]);
-
-            const topInd = sortedInd.slice(0, 5);
-
-            const otherIndVal = sortedInd.slice(5).reduce((acc, curr) => acc + curr[1], 0);
-
-            if(otherIndVal > 0) topInd.push(['Others', otherIndVal]);
-
-
-
-            const indLabels = topInd.map(i => i[0]);
-
-            const indValues = topInd.map(i => i[1]);
-
-
-
-            // 2. Location
-
-            const locCounts = {};
-
-            state.data.forEach(d => {
-
-                locCounts[d.city] = (locCounts[d.city] || 0) + 1;
-
-            });
-
-            const sortedLoc = Object.entries(locCounts).sort((a,b) => b[1] - a[1]);
-
-            const locLabels = sortedLoc.map(i => i[0]);
-
-            const locValues = sortedLoc.map(i => i[1]);
-
-
-
-            // 3. Deal Size Buckets
-
-            const buckets = { '<$30M': 0, '$30-50M': 0, '$50-80M': 0, '$80M+': 0 };
-
-            state.data.forEach(d => {
-
-                if (d.amount < 30) buckets['<$30M']++;
-
-                else if (d.amount < 50) buckets['$30-50M']++;
-
-                else if (d.amount < 80) buckets['$50-80M']++;
-
-                else buckets['$80M+']++;
-
-            });
-
-            const bucketLabels = Object.keys(buckets);
-
-            const bucketValues = Object.values(buckets);
-
-
-
-            // Chart Configuration Helpers
-
-            const commonOptions = {
-
-                responsive: true,
-
-                maintainAspectRatio: false,
-
-                plugins: {
-
-                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
-
+            new Chart(document.getElementById('industryChart'), {
+                type: 'bar',
+                data: {
+                    labels: topInds.map(i => i[0]),
+                    datasets: [{
+                        data: topInds.map(i => i[1]),
+                        backgroundColor: '#4f46e5', // Indigo 600
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { grid: { display: false } }, y: { display: false } }
                 }
-
-            };
-
-
-
-            // Render Chart 1: Industry (Bar)
-
-            updateChart('industryChart', 'bar', {
-
-                labels: indLabels,
-
-                datasets: [{
-
-                    label: 'Total Funding ($M)',
-
-                    data: indValues,
-
-                    backgroundColor: '#6366f1', // Indigo 500
-
-                    borderRadius: 4
-
-                }]
-
-            }, {
-
-                ...commonOptions,
-
-                plugins: { legend: { display: false } }, // Hide legend for single bar
-
-                scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
-
             });
 
+            // Location Chart
+            const locs = {};
+            startupData.forEach(d => { locs[d.city] = (locs[d.city] || 0) + 1; });
+            const topLocs = Object.entries(locs).sort((a,b) => b[1]-a[1]).slice(0,5);
 
-
-            // Render Chart 2: Location (Doughnut)
-
-            updateChart('locationChart', 'doughnut', {
-
-                labels: locLabels,
-
-                datasets: [{
-
-                    data: locValues,
-
-                    backgroundColor: ['#0f172a', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1'], // Slate palette
-
-                    borderWidth: 0
-
-                }]
-
-            }, commonOptions);
-
-
-
-            // Render Chart 3: Deal Size (Bar/Trend equivalent)
-
-            updateChart('dealSizeChart', 'bar', {
-
-                labels: bucketLabels,
-
-                datasets: [{
-
-                    label: '# of Deals',
-
-                    data: bucketValues,
-
-                    backgroundColor: '#10b981', // Emerald 500
-
-                    borderRadius: 4
-
-                }]
-
-            }, {
-
-                ...commonOptions,
-
-                plugins: { legend: { display: false } },
-
-                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
-
+            new Chart(document.getElementById('locationChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: topLocs.map(l => l[0]),
+                    datasets: [{
+                        data: topLocs.map(l => l[1]),
+                        backgroundColor: ['#0f172a', '#334155', '#475569', '#64748b', '#94a3b8'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } }
+                }
             });
-
         }
-
-
-
-        function updateChart(canvasId, type, data, options) {
-
-            const ctx = document.getElementById(canvasId).getContext('2d');
-
-            
-
-            if (charts[canvasId]) {
-
-                charts[canvasId].destroy();
-
-            }
-
-
-
-            charts[canvasId] = new Chart(ctx, {
-
-                type: type,
-
-                data: data,
-
-                options: options
-
-            });
-
-        }
-
-
-
     </script>
-
 </body>
-
 </html>
