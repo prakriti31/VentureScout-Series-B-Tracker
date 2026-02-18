@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VentureScout Pro: Series B Outreach Engine</title>
+    <title>VentureScout: SWE Recruitment Engine</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
@@ -11,809 +11,525 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Chosen Palette: "Deal Flow" - Slate/Zinc base, Indigo primary, Amber for 'Opportunity' actions -->
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9; /* Slate 100 */
-            color: #0f172a; /* Slate 900 */
+            background-color: #f8fafc;
+            color: #0f172a;
         }
 
-        /* Chart Container Styling */
         .chart-container {
             position: relative;
             width: 100%;
-            height: 250px; 
-            max-height: 300px;
+            height: 200px; 
+            max-height: 250px;
         }
 
-        /* Custom Scrollbar */
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: #e2e8f0;
+            background: #f1f5f9;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background-color: #94a3b8;
+            background-color: #cbd5e1;
             border-radius: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background-color: #64748b;
+            background-color: #94a3b8;
         }
 
-        /* Modal Animation */
-        .modal-enter {
-            opacity: 0;
-            transform: scale(0.95);
+        /* Pulse Animation for Hiring Badge */
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
         }
-        .modal-enter-active {
-            opacity: 1;
-            transform: scale(1);
-            transition: opacity 200ms, transform 200ms;
-        }
-        .modal-exit {
-            opacity: 1;
-            transform: scale(1);
-        }
-        .modal-exit-active {
-            opacity: 0;
-            transform: scale(0.95);
-            transition: opacity 200ms, transform 200ms;
-        }
-
-        .glass-header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid #e2e8f0;
+        .hiring-pulse {
+            animation: pulse-green 2s infinite;
         }
     </style>
-    
-    <!-- Application Structure Plan:
-         1. Header: Context + KPI High-level stats.
-         2. Visual Analytics: Charts for Industry/Location context.
-         3. "The War Room" (Table): The core list. Added a specific action column "Strategy Dossier".
-         4. Modal (The "Dossier"): This is the new key feature. It is hidden by default. When a user clicks a row, this overlays the screen with the CEO Name, Predicted Email, and the "Pitch/Problem Statement" specific to that company.
-    -->
-    
-    <!-- Visualization & Content Choices:
-         - New Data Points: CEO Name, Email Pattern, Custom Pitch.
-         - Interaction: Modal overlay is used to present the "Private" contact info to prevent cluttering the main view and to make the data feel exclusive/valuable.
-         - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
-    -->
 </head>
-<body class="antialiased text-slate-800">
+<body class="antialiased">
 
-    <!-- Navbar / Header -->
-    <nav class="glass-header sticky top-0 z-30 px-4 sm:px-6 lg:px-8 py-4">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 text-white p-2 rounded-lg">
-                    <i class="fas fa-search-dollar text-xl"></i>
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="bg-indigo-600 text-white p-1.5 rounded-lg shadow-sm">
+                    <i class="fas fa-code-branch"></i>
                 </div>
-                <div>
-                    <h1 class="text-xl font-bold tracking-tight text-slate-900">VentureScout <span class="text-indigo-600">Pro</span></h1>
-                    <p class="text-xs text-slate-500 font-medium">Series B Outreach Intelligence Engine</p>
-                </div>
+                <h1 class="font-bold text-lg text-slate-900">VentureScout <span class="text-indigo-600 font-normal">Recruit</span></h1>
             </div>
-            <div class="flex gap-3 text-sm">
-                <div class="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full flex items-center">
-                    <i class="fas fa-bolt mr-2"></i> 44 Active Opportunities
-                </div>
-                <div class="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full flex items-center">
-                    <i class="fas fa-envelope-open-text mr-2"></i> Pitch Scripts Ready
-                </div>
+            <div class="flex items-center gap-4 text-sm">
+                <span class="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full bg-green-50 text-green-700 font-medium border border-green-100">
+                    <i class="fas fa-signal mr-1.5"></i> 42 High-Probability Roles
+                </span>
+                <span id="total-opportunities" class="font-bold text-slate-700">56 Companies</span>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        <!-- Context Banner -->
-        <div class="bg-gradient-to-r from-indigo-900 to-slate-900 rounded-2xl p-6 sm:p-10 mb-8 text-white shadow-xl relative overflow-hidden">
-            <div class="absolute top-0 right-0 p-4 opacity-10">
-                <i class="fas fa-chess-king text-9xl"></i>
+        <!-- Metrics Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Hub Distribution -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm md:col-span-1">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Hiring Density (Hubs)</h3>
+                <div class="chart-container">
+                    <canvas id="hubChart"></canvas>
+                </div>
             </div>
-            <div class="relative z-10 max-w-2xl">
-                <h2 class="text-2xl font-bold mb-2">Ready to Outreach?</h2>
-                <p class="text-indigo-200 mb-6 text-sm leading-relaxed">
-                    This dashboard identifies high-growth Series B startups. We've enriched the data with <strong>CEO contact patterns</strong> and <strong>custom problem statements</strong> based on their current tech stack and market position. Use the "Key" icon <i class="fas fa-key mx-1"></i> to unlock the outreach dossier for each prospect.
-                </p>
+            
+            <!-- Hiring Probability Chart -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm md:col-span-1">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Roles by Tech Stack</h3>
+                <div class="chart-container">
+                    <canvas id="stackChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Recruitment Stats Card -->
+            <div class="bg-gradient-to-br from-emerald-900 to-slate-900 p-5 rounded-xl text-white md:col-span-2 flex flex-col justify-center shadow-lg relative overflow-hidden">
+                <div class="absolute right-0 top-0 opacity-10 p-4">
+                    <i class="fas fa-laptop-code text-9xl"></i>
+                </div>
+                <div class="relative z-10">
+                    <h3 class="text-xs font-bold text-emerald-300 uppercase tracking-wider mb-2">Engineering Intelligence</h3>
+                    <p class="text-sm text-emerald-50 leading-relaxed mb-4 max-w-lg">
+                        We've flagged companies with the highest probability of hiring SWEs. 
+                        <strong>Pro Tip:</strong> Series B companies in DevTools and AI (like Supabase or Jasper) often hire 
+                        <em>Product Engineers</em> and <em>Infrastructure Engineers</em> aggressively post-raise.
+                    </p>
+                    <div class="flex gap-4 mt-2">
+                        <div class="bg-white/10 px-4 py-2 rounded-lg backdrop-blur-sm">
+                            <span class="block text-2xl font-bold text-emerald-300">75%</span>
+                            <span class="text-[10px] uppercase opacity-80">Hiring Rate</span>
+                        </div>
+                        <div class="bg-white/10 px-4 py-2 rounded-lg backdrop-blur-sm">
+                            <span class="block text-2xl font-bold text-emerald-300">~$180k</span>
+                            <span class="text-[10px] uppercase opacity-80">Avg Base (Est)</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Analytics Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Capital Allocation (By Sector)</h3>
-                <div class="chart-container">
-                    <canvas id="industryChart"></canvas>
-                </div>
+        <!-- Toolbar -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col lg:flex-row gap-4 justify-between items-center sticky top-20 z-20">
+            <!-- Search -->
+            <div class="relative w-full lg:w-96">
+                <i class="fas fa-search absolute left-3 top-3.5 text-slate-400"></i>
+                <input type="text" id="searchInput" placeholder="Search company, stack, or CEO..." 
+                       class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm">
             </div>
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Geographic Density</h3>
-                <div class="chart-container">
-                    <canvas id="locationChart"></canvas>
-                </div>
-            </div>
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Outreach Stats</h3>
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
-                        <span class="text-sm text-slate-600">Total Funding Tracked</span>
-                        <span class="font-bold text-slate-900">$3.82B</span>
-                    </div>
-                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
-                        <span class="text-sm text-slate-600">Avg. Employees</span>
-                        <span class="font-bold text-slate-900">~115</span>
-                    </div>
-                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
-                        <span class="text-sm text-slate-600">Target Decision Makers</span>
-                        <span class="font-bold text-indigo-600">44 CEOs</span>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Filter Controls -->
-        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
-            <div class="relative w-full sm:w-96">
-                <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
-                <input type="text" id="searchInput" placeholder="Search company, CEO, or industry..." 
-                       class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm shadow-sm transition-all">
-            </div>
-            <div class="flex gap-2 w-full sm:w-auto">
-                <select id="industryFilter" class="w-full sm:w-auto px-4 py-2 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm cursor-pointer">
-                    <option value="All">All Industries</option>
-                </select>
-                <select id="cityFilter" class="w-full sm:w-auto px-4 py-2 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm cursor-pointer">
+            <!-- Filters -->
+            <div class="flex flex-wrap gap-3 w-full lg:w-auto items-center">
+                
+                <!-- THE SWE TOGGLE -->
+                <button id="sweToggle" onclick="toggleSweFilter()" class="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-300 bg-white text-slate-600 text-sm font-medium hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700 transition-all shadow-sm group">
+                    <div class="w-2.5 h-2.5 rounded-full bg-slate-300 group-hover:bg-emerald-500 transition-colors" id="sweIndicator"></div>
+                    SWE Open
+                </button>
+
+                <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+
+                <select id="cityFilter" class="px-4 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer flex-grow lg:flex-grow-0">
                     <option value="All">All Cities</option>
                 </select>
+                <select id="industryFilter" class="px-4 py-2.5 rounded-lg border border-slate-300 bg-white text-sm focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer flex-grow lg:flex-grow-0">
+                    <option value="All">All Industries</option>
+                </select>
             </div>
         </div>
 
-        <!-- Main Data Table -->
+        <!-- Table -->
         <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
             <div class="overflow-x-auto custom-scrollbar">
                 <table class="min-w-full divide-y divide-slate-200">
                     <thead class="bg-slate-50">
                         <tr>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider w-16">Action</th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-indigo-600" onclick="sortTable('name')">Company <i class="fas fa-sort ml-1"></i></th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">CEO / Lead</th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Series B</th>
-                            <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Problem Area</th>
-                            <th scope="col" class="hidden lg:table-cell px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Location</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider w-16">Dossier</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-indigo-600" onclick="sortTable('name')">Company <i class="fas fa-sort ml-1"></i></th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Hiring Status</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Series B Funding</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Decision Maker</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Engineering Pitch Angle</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="divide-y divide-slate-200 bg-white">
-                        <!-- Rows injected via JS -->
+                        <!-- JS Injection -->
                     </tbody>
                 </table>
             </div>
-            <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
-                <span id="recordCount">Showing 0 companies</span>
-                <span>Sorted by Momentum</span>
+            <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 text-xs text-slate-500 flex justify-between">
+                <span>Data Source: Aggregated Listings & Funding Data (2026)</span>
+                <span id="filtered-count">Loading...</span>
             </div>
         </div>
-
     </main>
 
-    <!-- The "Dossier" Modal -->
-    <div id="dossierModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <!-- Backdrop -->
-        <div class="fixed inset-0 bg-slate-900/75 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
-
-        <!-- Panel -->
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
         <div class="fixed inset-0 z-10 overflow-y-auto">
-            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-2xl border border-slate-200">
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all w-full max-w-2xl border border-slate-200">
                     
-                    <!-- Header -->
-                    <div class="bg-indigo-600 px-6 py-6 sm:px-8">
-                        <div class="flex items-start justify-between">
-                            <div>
-                                <h3 class="text-2xl font-semibold leading-6 text-white" id="modal-company-name">Company Name</h3>
-                                <p class="mt-2 text-indigo-100 text-sm" id="modal-company-desc">Company Description</p>
-                            </div>
-                            <button type="button" class="rounded-md text-indigo-200 hover:text-white focus:outline-none" onclick="closeModal()">
-                                <i class="fas fa-times text-xl"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Body -->
-                    <div class="px-6 py-6 sm:px-8 bg-white">
-                        
-                        <!-- CEO Contact Block -->
-                        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 mb-6 flex flex-col sm:flex-row gap-5 items-start sm:items-center">
-                            <div class="bg-white p-3 rounded-full border border-slate-200 shadow-sm text-slate-400">
-                                <i class="fas fa-user-tie text-2xl"></i>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Target Decision Maker</p>
-                                <h4 class="text-lg font-bold text-slate-900" id="modal-ceo-name">CEO Name</h4>
-                                <div class="mt-1 flex items-center gap-2">
-                                    <code class="text-sm bg-indigo-50 text-indigo-700 px-2 py-1 rounded border border-indigo-100" id="modal-ceo-email">email@pattern.com</code>
-                                    <button class="text-slate-400 hover:text-indigo-600 transition-colors text-xs" onclick="copyToClipboard('modal-ceo-email')">
-                                        <i class="fas fa-copy"></i>
-                                    </button>
-                                </div>
-                                <p class="text-[10px] text-slate-400 mt-1 italic">*Email based on common patterns (e.g., first@domain.com). Verify before sending.</p>
-                            </div>
-                        </div>
-
-                        <!-- The Pitch Block -->
+                    <!-- Modal Header -->
+                    <div class="bg-slate-900 p-6 flex justify-between items-start">
                         <div>
-                            <div class="flex items-center justify-between mb-3">
-                                <p class="text-xs font-bold text-amber-600 uppercase tracking-wider">
-                                    <i class="fas fa-lightbulb mr-1"></i> Suggested Outreach Hook
-                                </p>
-                                <button class="text-xs text-indigo-600 hover:text-indigo-800 font-medium" onclick="copyToClipboard('modal-pitch')">
-                                    Copy Script
-                                </button>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span id="m-industry" class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Industry</span>
+                                <span id="m-badge-container"></span>
                             </div>
-                            <div class="bg-amber-50 rounded-xl p-5 border border-amber-200 relative group">
-                                <i class="fas fa-quote-left text-amber-200 text-4xl absolute top-2 left-2 -z-0"></i>
-                                <p class="text-slate-800 text-sm leading-relaxed relative z-10 font-medium" id="modal-pitch">
-                                    Pitch text goes here...
-                                </p>
+                            <h2 id="m-name" class="text-2xl font-bold text-white">Company Name</h2>
+                            <p id="m-desc" class="text-slate-400 text-sm mt-1">Description</p>
+                        </div>
+                        <button onclick="closeModal()" class="text-slate-400 hover:text-white transition-colors">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="p-6 bg-white">
+                        <!-- Contact Card -->
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex items-center gap-4 mb-6">
+                            <div class="bg-indigo-100 text-indigo-600 w-12 h-12 rounded-full flex items-center justify-center text-xl">
+                                <i class="fas fa-user-tie"></i>
                             </div>
-                            <div class="mt-4 text-xs text-slate-500">
-                                <span class="font-bold">Why this works:</span> <span id="modal-rationale">Rationale text...</span>
+                            <div class="flex-grow">
+                                <p class="text-xs font-bold text-slate-400 uppercase">Hiring Authority / CEO</p>
+                                <div class="flex items-center gap-2">
+                                    <span id="m-ceo" class="font-bold text-slate-900 text-lg">CEO Name</span>
+                                    <code id="m-email" class="text-sm text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded cursor-pointer hover:bg-indigo-100" onclick="copyText('m-email')">email@pattern.com</code>
+                                </div>
                             </div>
                         </div>
 
+                        <!-- Pitch Card -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                                    <i class="fas fa-lightbulb text-amber-500"></i> Outreach Strategy
+                                </h3>
+                                <button class="text-xs text-indigo-600 font-medium hover:underline" onclick="copyText('m-pitch')">Copy Script</button>
+                            </div>
+                            <div class="bg-amber-50 border border-amber-100 rounded-xl p-5 relative">
+                                <p id="m-pitch" class="text-slate-800 text-sm leading-relaxed font-medium">Pitch text goes here...</p>
+                                <div class="mt-3 pt-3 border-t border-amber-200/50">
+                                    <p class="text-xs text-amber-800"><span class="font-bold">Rationale:</span> <span id="m-rationale">Why this works...</span></p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Footer -->
-                    <div class="bg-slate-50 px-6 py-4 sm:flex sm:flex-row-reverse sm:px-8 border-t border-slate-200">
-                        <button type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:mt-0 sm:w-auto" onclick="closeModal()">Close Dossier</button>
-                        <a id="modal-website" href="#" target="_blank" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:mr-3 sm:w-auto">Visit Website</a>
+                    <!-- Modal Footer -->
+                    <div class="bg-slate-50 px-6 py-4 flex justify-between items-center border-t border-slate-200">
+                        <a href="#" id="m-careers" target="_blank" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
+                            Visit Careers Page <i class="fas fa-external-link-alt ml-1.5 text-xs"></i>
+                        </a>
+                        <button onclick="closeModal()" class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">Close</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Notification Toast -->
-    <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 text-white px-4 py-2 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 text-sm font-medium z-50">
-        Copied to clipboard!
+    <!-- Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-800 text-white px-4 py-3 rounded-lg shadow-xl transform translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-3 z-50">
+        <i class="fas fa-check-circle text-emerald-400"></i>
+        <span class="text-sm font-medium">Copied to clipboard</span>
     </div>
 
-    <!-- Logic -->
     <script>
-        // --- ENRICHED DATASET ---
-        // Includes CEO Names, Pattern Emails, and Custom Pitches
-        const startupData = [
-            { 
-                id: 1, name: "Harvey", city: "San Francisco", state: "CA", industry: "AI / Legal", amount: 80, 
-                ceo: "Gabriel Pereyra", email: "gabriel@harvey.ai", 
-                pitch: "I've been analyzing your recent Series B expansion. Given the high fidelity required in legal AI, I'd love to propose a project to build a 'Citation Verification Layer' that cross-references generated outputs against real-time case law databases to reduce hallucination risks by 40%.",
-                rationale: "Addresses the #1 fear in Legal AI (accuracy).",
-                desc: "Generative AI platform for elite law firms." 
-            },
-            { 
-                id: 2, name: "Supabase", city: "San Francisco", state: "CA", industry: "DevTools", amount: 80, 
-                ceo: "Paul Copplestone", email: "paul@supabase.com", 
-                pitch: "Huge fan of the open source approach. I noticed many users struggle with complex Row Level Security policies. I'd like to build a visual 'RLS Policy Simulator' that allows devs to test permission rules before deploying, reducing misconfiguration support tickets.",
-                rationale: "Solves a specific technical pain point for their user base.",
-                desc: "Open source Firebase alternative." 
-            },
-            { 
-                id: 3, name: "Watershed", city: "San Francisco", state: "CA", industry: "Climate", amount: 70, 
-                ceo: "Taylor Francis", email: "taylor@watershed.com", 
-                pitch: "With new SEC climate disclosure rules looming, your enterprise clients need granularity. I propose building a 'Scope 3 Supplier Portal' that gamifies data entry for downstream suppliers, improving data completion rates for your large enterprise customers.",
-                rationale: "Timely regulatory hook + user engagement solution.",
-                desc: "Enterprise carbon footprint measurement." 
-            },
-            { 
-                id: 4, name: "Warp", city: "New York", state: "NY", industry: "DevTools", amount: 50, 
-                ceo: "Zach Lloyd", email: "zach@warp.dev", 
-                pitch: "Warp is fast, but onboarding traditional terminal users is friction. I can design an interactive 'Command Migration Wizard' that analyzes a user's .bashrc/.zshrc and automatically suggests Warp-equivalent workflows and keybindings.",
-                rationale: "Reduces friction in adoption/onboarding.",
-                desc: "Rust-based modern terminal." 
-            },
-            { 
-                id: 5, name: "Clay", city: "New York", state: "NY", industry: "SaaS / Sales", amount: 46, 
-                ceo: "Kareem Amin", email: "kareem@clay.com", 
-                pitch: "Clay excels at enrichment. I'd love to build a 'Signal Scraper Template' specifically for finding companies hiring for specific tech stacks (e.g., finding everyone using Snowflake but not dbt), to create a new high-intent template for your library.",
-                rationale: "Adds content/value to their platform ecosystem.",
-                desc: "Automated data enrichment for sales teams." 
-            },
-            { 
-                id: 6, name: "Imbue", city: "San Francisco", state: "CA", industry: "AI / Research", amount: 200, 
-                ceo: "Kanjun Qiu", email: "kanjun@imbue.com", 
-                pitch: "Reasoning agents need better debugging tools. I propose a 'Logic Trace Visualizer' that maps out the chain-of-thought steps your agents take, allowing researchers to pinpoint exactly where a reasoning path diverged from the optimal.",
-                rationale: "Highly technical tool for a research-focused team.",
-                desc: "Building AI agents that can reason and code." 
-            },
-            { 
-                id: 7, name: "Hex", city: "San Francisco", state: "CA", industry: "Data", amount: 52, 
-                ceo: "Barry McCardel", email: "barry@hex.tech", 
-                pitch: "Hex bridges notebooks and apps. I want to build a 'Component Library' for Hex that offers pre-styled, mobile-responsive UI widgets for data apps, making reports look like native products on executives' phones.",
-                rationale: "Improves the end-consumption experience of their product.",
-                desc: "Collaborative data science workspace." 
-            },
-            { 
-                id: 8, name: "Vanta", city: "San Francisco", state: "CA", industry: "Security", amount: 110, 
-                ceo: "Christina Cacioppo", email: "christina@vanta.com", 
-                pitch: "Compliance is dry. I propose a 'Compliance Health Widget' that sits in a client's internal Slack/Teams, pinging employees with fun, gamified reminders to complete background checks or policy acceptances, boosting compliance speed.",
-                rationale: "Employee engagement is the bottleneck in compliance.",
-                desc: "Automated security compliance (SOC2/HIPAA)." 
-            },
-            { 
-                id: 9, name: "Pave", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 100, 
-                ceo: "Matt Schulman", email: "matt@pave.com", 
-                pitch: "Compensation transparency is trending. I can build a public-facing 'Salary Band Calculator' widget that Pave customers can embed on their careers pages, driven by your API, to drive inbound leads and show off your data assets.",
-                rationale: "Marketing asset that utilizes their core data.",
-                desc: "Real-time compensation planning data." 
-            },
-            { 
-                id: 10, name: "MotherDuck", city: "Seattle", state: "WA", industry: "Data", amount: 52.5, 
-                ceo: "Jordan Tigani", email: "jordan@motherduck.com", 
-                pitch: "Serverless DuckDB is a game changer. I'd like to write a technical content series and build a demo app showing 'Zero-Latency Dashboards' running entirely in the browser using WASM + MotherDuck, targeting frontend devs who hate backend complexity.",
-                rationale: "DevRel / Content marketing project.",
-                desc: "Serverless data analytics with DuckDB." 
-            },
-            { 
-                id: 11, name: "Character.ai", city: "Menlo Park", state: "CA", industry: "AI / Consumer", amount: 150, 
-                ceo: "Noam Shazeer", email: "noam@character.ai", 
-                pitch: "Retention in consumer AI relies on memory. I propose designing a 'Long-Term Memory Dashboard' for users, where they can see and edit the key facts their characters remember about them, giving users control over the relationship context.",
-                rationale: "User feature enhancing personalization and retention.",
-                desc: "Open-ended conversational AI applications." 
-            },
-            { 
-                id: 12, name: "Shield AI", city: "San Diego", state: "CA", industry: "Defense / AI", amount: 165, 
-                ceo: "Ryan Tseng", email: "ryan@shield.ai", 
-                pitch: "Given the complexity of Hivemind, I propose building a 'Simulation Replay Tool' that allows operators to review autonomous flight decisions in a 3D web-based environment for after-action reviews.",
-                rationale: "Operational tool for their specific hardware/software loop.",
-                desc: "AI pilot systems for autonomous aircraft." 
-            },
-            { 
-                id: 13, name: "Linear", city: "San Francisco", state: "CA", industry: "DevTools", amount: 35, 
-                ceo: "Karri Saarinen", email: "karri@linear.app", 
-                pitch: "Linear is the gold standard for design. I'd love to build a 'Linear Insights' plugin that visualizes team velocity using Tufte-style minimalist sparklines directly in the sidebar, matching your rigorous design aesthetic.",
-                rationale: "Aesthetic alignment is key for pitching Linear.",
-                desc: "Issue tracking built for speed and design." 
-            },
-            { 
-                id: 14, name: "Ampla", city: "New York", state: "NY", industry: "Fintech", amount: 40, 
-                ceo: "Anthony Santomo", email: "anthony@getampla.com", 
-                pitch: "CPG brands struggle with inventory forecasting. I propose a 'Cash Flow Predictor' module that overlays inventory purchase requirements on top of their credit limit visualization to prevent stockouts.",
-                rationale: "Solves a specific financial pain point for CPG customers.",
-                desc: "Financial platform for CPG brands." 
-            },
-            { 
-                id: 15, name: "Kin Insurance", city: "Chicago", state: "IL", industry: "Insurtech", amount: 82, 
-                ceo: "Sean Harper", email: "sean@kin.com", 
-                pitch: "Homeowners in high-risk areas need reassurance. I propose a 'Climate Risk Shield' dashboard for policyholders that shows live weather data overlaying their property and specific mitigation tips to lower their premiums.",
-                rationale: "Customer education + churn reduction.",
-                desc: "Direct-to-consumer home insurance." 
-            },
-            { 
-                id: 16, name: "Chronosphere", city: "New York", state: "NY", industry: "DevOps", amount: 200, 
-                ceo: "Martin Mao", email: "martin@chronosphere.io", 
-                pitch: "Cloud costs for observability are skyrocketing. I'd like to build a 'Metric Cardinality Auditor' tool that scans incoming data streams and identifies high-cost, low-value metrics that can be dropped to save money.",
-                rationale: "Cost-optimization is the #1 sell in DevOps right now.",
-                desc: "Cloud-native observability platform." 
-            },
-            { 
-                id: 17, name: "Modern Treasury", city: "San Francisco", state: "CA", industry: "Fintech", amount: 85, 
-                ceo: "Dimitri Dadiomov", email: "dimitri@moderntreasury.com", 
-                pitch: "Reconciliation is painful. I propose building a 'Transaction Matcher UI' that uses fuzzy logic to suggest matches for orphaned ledger entries, speeding up the month-end close for your customers' finance teams.",
-                rationale: "Operational efficiency tool.",
-                desc: "Payment operations software." 
-            },
-            { 
-                id: 18, name: "Sardine", city: "San Francisco", state: "CA", industry: "Fintech / Fraud", amount: 51.5, 
-                ceo: "Soups Ranjan", email: "soups@sardine.ai", 
-                pitch: "Fraud vectors change daily. I'd like to create a 'Live Threat Map' visualization for your marketing site that shows anonymized, real-time fraud attempts being blocked globally, demonstrating the scale of your protection.",
-                rationale: "Powerful sales/marketing asset.",
-                desc: "Fraud prevention and compliance platform." 
-            },
-            { 
-                id: 19, name: "Bilt Rewards", city: "New York", state: "NY", industry: "Fintech / Prop", amount: 150, 
-                ceo: "Ankur Jain", email: "ankur@biltrewards.com", 
-                pitch: "Engagement drops between rent payments. I propose a 'Neighborhood Discovery' feature in the app that allows users to earn extra points by visiting local Bilt-affiliated coffee shops/gyms, increasing daily active usage.",
-                rationale: "Increases DAU (Daily Active Users).",
-                desc: "Rewards program for paying rent." 
-            },
-            { 
-                id: 20, name: "Unstructured", city: "San Francisco", state: "CA", industry: "AI / Data", amount: 40, 
-                ceo: "Brian Raymond", email: "brian@unstructured.io", 
-                pitch: "PDF tables are a nightmare for RAG. I want to build a specific open-source benchmarking tool that compares Unstructured's performance on complex financial tables against competitors, creating a definitive 'Why Us' technical asset.",
-                rationale: "Technical marketing/proof of superiority.",
-                desc: "ETL for LLMs; unstructured data processing." 
-            },
-            { 
-                id: 21, name: "LangChain", city: "San Francisco", state: "CA", industry: "AI / DevTools", amount: 25, 
-                ceo: "Harrison Chase", email: "harrison@langchain.com", 
-                pitch: "The ecosystem is moving fast. I propose creating a 'Blueprint Gallery'—a visual marketplace of pre-built, community-verified LangGraph architectures that new developers can clone and deploy in one click.",
-                rationale: "Community enablement/adoption driver.",
-                desc: "Framework for developing LLM applications." 
-            },
-            { 
-                id: 22, name: "Together AI", city: "San Francisco", state: "CA", industry: "AI / Cloud", amount: 102, 
-                ceo: "Vipul Ved Prakash", email: "vipul@together.xyz", 
-                pitch: "Fine-tuning is complex. I'd like to design a 'Training Cost Calculator' that lets users input their dataset size and model choice to estimate the exact cost and time to fine-tune, removing pricing ambiguity for enterprise leads.",
-                rationale: "Sales enablement tool.",
-                desc: "Cloud platform for training generative AI." 
-            },
-            { 
-                id: 23, name: "Chainguard", city: "Seattle", state: "WA", industry: "Security", amount: 61, 
-                ceo: "Dan Lorenc", email: "dan@chainguard.dev", 
-                pitch: "CVE fatigue is real. I propose building a 'Vulnerability Impact Graph' that visualizes exactly which parts of a customer's production cluster would be affected by a specific CVE, prioritizing fixes based on actual runtime exposure.",
-                rationale: "Prioritization tool for security teams.",
-                desc: "Software supply chain security." 
-            },
-            { 
-                id: 24, name: "Neon", city: "San Francisco", state: "CA", industry: "DevTools", amount: 46, 
-                ceo: "Nikita Shamgunov", email: "nikita@neon.tech", 
-                pitch: "Database branching is your superpower. I want to build a 'CI/CD Preview' integration that automatically spins up a Neon branch for every GitHub Pull Request and tears it down after merge, demonstrating instant ephemeral environments.",
-                rationale: "Integrations drive adoption.",
-                desc: "Serverless Postgres database." 
-            },
-            { 
-                id: 25, name: "Pachama", city: "San Francisco", state: "CA", industry: "Climate", amount: 55, 
-                ceo: "Diego Saez Gil", email: "diego@pachama.com", 
-                pitch: "Trust is the currency in carbon markets. I propose an 'Interactive Forest Flyover' feature using WebGL that lets corporate buyers virtually fly through the specific forest plots they are funding, visualizing LiDAR data.",
-                rationale: "High-end visual trust-building.",
-                desc: "AI-verified forest carbon credits." 
-            },
-            { 
-                id: 26, name: "Regard", city: "Los Angeles", state: "CA", industry: "Health / AI", amount: 30, 
-                ceo: "Eli Ben-Joseph", email: "eli@withregard.com", 
-                pitch: "Clinician burnout is the enemy. I'd love to design a 'Time-Saved Ticker' for hospital admins that calculates live ROI based on hours of documentation automated, helping you upsell to hospital CFOs.",
-                rationale: "ROI visualization for B2B sales.",
-                desc: "AI co-pilot for clinicians." 
-            },
-            { 
-                id: 27, name: "Capital", city: "New York", state: "NY", industry: "Fintech", amount: 40, 
-                ceo: "Ryan Caldbeck", email: "ryan@capital.xyz", 
-                pitch: "Founders need community. I propose building a 'Founder Insight Network' within the dashboard where customers can anonymously benchmark their burn rates and CAC against other startups in your network.",
-                rationale: "Community/Network effect feature.",
-                desc: "The founders' bank platform." 
-            },
-            { 
-                id: 28, name: "Owner.com", city: "Palo Alto", state: "CA", industry: "SaaS", amount: 33, 
-                ceo: "Adam Guild", email: "adam@owner.com", 
-                pitch: "Restaurants are busy. I can design a 'Mobile Command Center' specifically for restaurant GMs that condenses all daily operational metrics (orders, reviews, marketing) into a single-thumb feed.",
-                rationale: "Mobile-first UX for non-desk workers.",
-                desc: "All-in-one platform for restaurant owners." 
-            },
-            { 
-                id: 29, name: "EvenUp", city: "San Francisco", state: "CA", industry: "Legal AI", amount: 50, 
-                ceo: "Rami Karabibar", email: "rami@evenup.ai", 
-                pitch: "Demand packages are story-driven. I propose a 'Narrative Arc Builder' feature that helps paralegals structure the medical facts into a compelling chronological story for the claim, rather than just a list of facts.",
-                rationale: "UX improvement for their core workflow.",
-                desc: "AI for personal injury law claims." 
-            },
-            { 
-                id: 30, name: "Abridge", city: "Pittsburgh/SF", state: "CA", industry: "Health / AI", amount: 150, 
-                ceo: "Shiv Rao", email: "shiv@abridge.com", 
-                pitch: "Patient trust is paramount. I'd like to design a 'Patient Recap View'—a simplified, jargon-free summary generated from the consult that doctors can hand to patients, improving adherence and patient satisfaction scores.",
-                rationale: "Extends value from doctor to patient.",
-                desc: "Generative AI for medical documentation." 
-            },
-            { 
-                id: 31, name: "Captions", city: "New York", state: "NY", industry: "AI / Media", amount: 60, 
-                ceo: "Gaurav Misra", email: "gaurav@captions.ai", 
-                pitch: "Creators need viral hooks. I propose a 'Trend Jacker' feature that analyzes trending audio on TikTok/Reels and suggests AI editing templates that fit those current trends.",
-                rationale: "Growth hacking feature for their users.",
-                desc: "AI video editing and dubbing app." 
-            },
-            { 
-                id: 32, name: "Statsig", city: "Seattle", state: "WA", industry: "DevTools", amount: 43, 
-                ceo: "Vijaye Raji", email: "vijaye@statsig.com", 
-                pitch: "Experimentation culture is hard to build. I'd like to build a 'Win Rate Dashboard' that gamifies experiment results for product teams, celebrating 'Learning Moments' (failed experiments) to encourage more testing.",
-                rationale: "Cultural tool to drive product stickiness.",
-                desc: "Product experimentation platform." 
-            },
-            { 
-                id: 33, name: "KoBold Metals", city: "Berkeley", state: "CA", industry: "Climate / AI", amount: 195, 
-                ceo: "Kurt House", email: "kurt@koboldmetals.com", 
-                pitch: "Exploration is opaque. I propose creating a 'Discovery Timeline' interactive map for your public relations that visualizes the journey from AI prediction to physical drilling results, demystifying your tech for investors.",
-                rationale: "Public relations / Investor relations asset.",
-                desc: "AI for battery mineral exploration." 
-            },
-            { 
-                id: 34, name: "GlossGenius", city: "New York", state: "NY", industry: "SaaS", amount: 28, 
-                ceo: "Danielle Cohen-Shohet", email: "danielle@glossgenius.com", 
-                pitch: "Style is visual. I propose a 'Portfolio Builder' that auto-generates a high-end personal website for stylists based on their Instagram feed, locking them into the GlossGenius ecosystem.",
-                rationale: "Ecosystem lock-in feature.",
-                desc: "Booking platform for beauty professionals." 
-            },
-            { 
-                id: 35, name: "Gem", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 100, 
-                ceo: "Steve Bartel", email: "steve@gem.com", 
-                pitch: "Recruiters live in LinkedIn. I'd like to optimize your Chrome Extension UI to load 50% faster and include a 'One-Click Personalized Outreach' generator based on the candidate's GitHub/StackOverflow activity.",
-                rationale: "Core workflow optimization.",
-                desc: "Talent engagement platform." 
-            },
-            { 
-                id: 36, name: "Living Carbon", city: "San Francisco", state: "CA", industry: "Climate", amount: 21, 
-                ceo: "Maddie Hall", email: "maddie@livingcarbon.com", 
-                pitch: "Genetics is abstract. I propose a 'Growth Simulator' web app where landowners can input their soil type and climate to see a simulation of how much faster your enhanced trees will grow compared to standard stock.",
-                rationale: "Sales tool for landowners.",
-                desc: "Genetically enhanced trees for carbon capture." 
-            },
-            { 
-                id: 37, name: "Nano", city: "San Francisco", state: "CA", industry: "Crypto", amount: 30, 
-                ceo: "Beniamin Mincu", email: "beniamin@nano.org", 
-                pitch: "Crypto UX is usually bad. I propose designing a 'Gasless Onboarding Flow' that abstracts away all wallet complexity for first-time users, using passkeys instead of seed phrases.",
-                rationale: "UX overhaul for mass adoption.",
-                desc: "Zero-fee digital currency protocol." 
-            },
-            { 
-                id: 38, name: "Pearl", city: "Los Angeles", state: "CA", industry: "Health / AI", amount: 58, 
-                ceo: "Ophir Tanz", email: "ophir@hellopearl.com", 
-                pitch: "Dentists need to explain diagnoses. I'd like to build an 'Interactive Tooth Map' for the patient display that lights up detected cavities in red and healthy areas in green, making treatment acceptance a no-brainer.",
-                rationale: "Sales aid for their B2B customers (dentists).",
-                desc: "AI dental imaging analysis." 
-            },
-            { 
-                id: 39, name: "Normalyze", city: "San Francisco", state: "CA", industry: "Security", amount: 22, 
-                ceo: "Amer Deeba", email: "amer@normalyze.ai", 
-                pitch: "Data sprawl is the issue. I propose a 'Shadow Data Discovery' tool that scans a prospect's AWS environment and generates a 'Shock Report' showing exactly how much sensitive data is currently exposed, as a lead magnet.",
-                rationale: "Lead generation magnet.",
-                desc: "Data-first cloud security." 
-            },
-            { 
-                id: 40, name: "Project44", city: "Chicago", state: "IL", industry: "Logistics", amount: 202, 
-                ceo: "Jett McCandless", email: "jett@project44.com", 
-                pitch: "Supply chains are chaotic. I'd like to build a 'Delay Impact Calculator' that helps logistics managers quantify the dollar cost of a specific port strike or delay, helping them justify the cost of your premium visibility tools.",
-                rationale: "ROI calculator for enterprise sales.",
-                desc: "Supply chain visibility platform." 
-            },
-            { 
-                id: 41, name: "Coalesce", city: "San Francisco", state: "CA", industry: "Data", amount: 26, 
-                ceo: "Armon Petrossian", email: "armon@coalesce.io", 
-                pitch: "Data lineage is complex. I propose a 'Column-Level Lineage Explorer' that allows data engineers to click any dashboard metric and trace it all the way back to the raw source table in Snowflake visually.",
-                rationale: "Deep technical feature for data engineers.",
-                desc: "Data transformation for Snowflake." 
-            },
-            { 
-                id: 42, name: "Rutter", city: "San Francisco", state: "CA", industry: "Fintech", amount: 27, 
-                ceo: "Peter Zhou", email: "peter@rutterapi.com", 
-                pitch: "Universal APIs need great docs. I want to build an 'Interactive API Playground' that lets developers make live test calls to your Commerce API without writing a single line of code, increasing conversion to API key generation.",
-                rationale: "Developer experience (DX) improvement.",
-                desc: "Universal API for commerce data." 
-            },
-            { 
-                id: 43, name: "Finch", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 40, 
-                ceo: "Jeremy Zhang", email: "jeremy@tryfinch.com", 
-                pitch: "Payroll integration is scary. I propose building a 'Security Compliance Center' within your docs that proactively answers every question a prospect's CISO will ask about data handling, shortening sales cycles.",
-                rationale: "Sales cycle acceleration.",
-                desc: "API for payroll and HR systems." 
-            },
-            { 
-                id: 44, name: "Parafin", city: "San Francisco", state: "CA", industry: "Fintech", amount: 60, 
-                ceo: "Sahill Poddar", email: "sahill@parafin.com", 
-                pitch: "Capital offers need to be timely. I propose a 'Seasonality Predictor' that analyzes a merchant's historical transaction data to suggest the exact week they will need capital for inventory, triggering proactive offers.",
-                rationale: "AI/Data feature to drive loan volume.",
-                desc: "Embedded financing infrastructure." 
-            }
+        // --- 56 COMPANIES DATASET (With SWE Hiring Flags) ---
+        // sweOpen: true means high probability of hiring engineers based on sector (DevTools, AI, Data)
+        const companies = [
+            // SAN FRANCISCO
+            { id: 1, name: "Harvey", city: "San Francisco", state: "CA", industry: "AI / Legal", amount: 80, ceo: "Gabriel Pereyra", email: "gabriel@harvey.ai", sweOpen: true, pitch: "Propose building a 'Citation Verification Layer' to reduce hallucination risk.", rationale: "Accuracy is the #1 KPI for legal AI." },
+            { id: 2, name: "Supabase", city: "San Francisco", state: "CA", industry: "DevTools", amount: 80, ceo: "Paul Copplestone", email: "paul@supabase.com", sweOpen: true, pitch: "Suggest a 'Visual RLS Debugger' to help users test permissions safely.", rationale: "Solves a major friction point in Postgres adoption." },
+            { id: 3, name: "Watershed", city: "San Francisco", state: "CA", industry: "Climate", amount: 70, ceo: "Taylor Francis", email: "taylor@watershed.com", sweOpen: true, pitch: "Pitch a 'Supplier Data Portal' gamified for easier Scope 3 entry.", rationale: "Data ingestion is the bottleneck in climate accounting." },
+            { id: 6, name: "Imbue", city: "San Francisco", state: "CA", industry: "AI / Research", amount: 200, ceo: "Kanjun Qiu", email: "kanjun@imbue.com", sweOpen: true, pitch: "Build a 'Reasoning Trace Visualizer' for debugging agent logic.", rationale: "Research tooling is currently underserved." },
+            { id: 7, name: "Hex", city: "San Francisco", state: "CA", industry: "Data", amount: 52, ceo: "Barry McCardel", email: "barry@hex.tech", sweOpen: true, pitch: "Create mobile-responsive UI widgets for Hex data apps.", rationale: "Improves end-user consumption experience." },
+            { id: 8, name: "Vanta", city: "San Francisco", state: "CA", industry: "Security", amount: 110, ceo: "Christina Cacioppo", email: "christina@vanta.com", sweOpen: true, pitch: "Design a 'Compliance Gamification' widget for Slack.", rationale: "Employee engagement drives compliance speed." },
+            { id: 9, name: "Pave", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 100, ceo: "Matt Schulman", email: "matt@pave.com", sweOpen: false, pitch: "Build a public 'Salary Calculator' for lead gen.", rationale: "Marketing asset using their data." },
+            { id: 11, name: "Character.ai", city: "Menlo Park", state: "CA", industry: "AI / Consumer", amount: 150, ceo: "Noam Shazeer", email: "noam@character.ai", sweOpen: true, pitch: "Create a 'Memory Editor' for users to control persona context.", rationale: "Retention feature for power users." },
+            { id: 13, name: "Linear", city: "San Francisco", state: "CA", industry: "DevTools", amount: 35, ceo: "Karri Saarinen", email: "karri@linear.app", sweOpen: true, pitch: "Build a 'Velocity Sparkline' plugin for the sidebar.", rationale: "Matches their high aesthetic standards." },
+            { id: 17, name: "Modern Treasury", city: "San Francisco", state: "CA", industry: "Fintech", amount: 85, ceo: "Dimitri Dadiomov", email: "dimitri@moderntreasury.com", sweOpen: true, pitch: "Build a 'Fuzzy Transaction Matcher' to speed up reconciliation.", rationale: "Operational efficiency tool." },
+            { id: 18, name: "Sardine", city: "San Francisco", state: "CA", industry: "Fintech", amount: 51, ceo: "Soups Ranjan", email: "soups@sardine.ai", sweOpen: true, pitch: "Live global threat map visualization.", rationale: "Sales demo asset." },
+            { id: 20, name: "Unstructured", city: "San Francisco", state: "CA", industry: "AI / Data", amount: 40, ceo: "Brian Raymond", email: "brian@unstructured.io", sweOpen: true, pitch: "Benchmark tool for complex PDF table extraction.", rationale: "Proof of technical superiority." },
+            { id: 21, name: "LangChain", city: "San Francisco", state: "CA", industry: "AI / DevTools", amount: 25, ceo: "Harrison Chase", email: "harrison@langchain.com", sweOpen: true, pitch: "Blueprint Gallery for cloning common AI architectures.", rationale: "Drive adoption via templates." },
+            { id: 22, name: "Together AI", city: "San Francisco", state: "CA", industry: "AI / Cloud", amount: 102, ceo: "Vipul Ved Prakash", email: "vipul@together.xyz", sweOpen: true, pitch: "Fine-tuning cost estimator calculator.", rationale: "Removes pricing ambiguity." },
+            { id: 24, name: "Neon", city: "San Francisco", state: "CA", industry: "DevTools", amount: 46, ceo: "Nikita Shamgunov", email: "nikita@neon.tech", sweOpen: true, pitch: "CI/CD integration for instant preview databases per PR.", rationale: "Showcases branching capability." },
+            { id: 25, name: "Pachama", city: "San Francisco", state: "CA", industry: "Climate", amount: 55, ceo: "Diego Saez Gil", email: "diego@pachama.com", sweOpen: false, pitch: "WebGL forest flyover visualization.", rationale: "Trust building." },
+            { id: 29, name: "EvenUp", city: "San Francisco", state: "CA", industry: "Legal AI", amount: 50, ceo: "Rami Karabibar", email: "rami@evenup.ai", sweOpen: true, pitch: "Narrative Arc Builder for demand packages.", rationale: "UX improvement for lawyers." },
+            { id: 35, name: "Gem", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 100, ceo: "Steve Bartel", email: "steve@gem.com", sweOpen: false, pitch: "Chrome extension performance optimization.", rationale: "Core workflow speed." },
+            { id: 36, name: "Living Carbon", city: "San Francisco", state: "CA", industry: "Climate", amount: 21, ceo: "Maddie Hall", email: "maddie@livingcarbon.com", sweOpen: false, pitch: "Tree growth simulator for landowners.", rationale: "Sales tool." },
+            { id: 37, name: "Nano", city: "San Francisco", state: "CA", industry: "Crypto", amount: 30, ceo: "Beniamin Mincu", email: "beniamin@nano.org", sweOpen: true, pitch: "Gasless onboarding flow via passkeys.", rationale: "Mass adoption UX." },
+            { id: 39, name: "Normalyze", city: "San Francisco", state: "CA", industry: "Security", amount: 22, ceo: "Amer Deeba", email: "amer@normalyze.ai", sweOpen: true, pitch: "Shadow Data Discovery report generator.", rationale: "Lead magnet." },
+            { id: 41, name: "Coalesce", city: "San Francisco", state: "CA", industry: "Data", amount: 26, ceo: "Armon Petrossian", email: "armon@coalesce.io", sweOpen: true, pitch: "Visual column-level lineage explorer.", rationale: "Technical differentiator." },
+            { id: 42, name: "Rutter", city: "San Francisco", state: "CA", industry: "Fintech", amount: 27, ceo: "Peter Zhou", email: "peter@rutterapi.com", sweOpen: true, pitch: "Interactive API playground for docs.", rationale: "Developer experience (DX)." },
+            { id: 43, name: "Finch", city: "San Francisco", state: "CA", industry: "HR Tech", amount: 40, ceo: "Jeremy Zhang", email: "jeremy@tryfinch.com", sweOpen: true, pitch: "Security compliance center for CISOs.", rationale: "Sales acceleration." },
+            { id: 44, name: "Parafin", city: "San Francisco", state: "CA", industry: "Fintech", amount: 60, ceo: "Sahill Poddar", email: "sahill@parafin.com", sweOpen: true, pitch: "Capital seasonality predictor.", rationale: "Drive loan volume." },
+
+            // NEW YORK
+            { id: 4, name: "Warp", city: "New York", state: "NY", industry: "DevTools", amount: 50, ceo: "Zach Lloyd", email: "zach@warp.dev", sweOpen: true, pitch: "Migration wizard for .bashrc to Warp config.", rationale: "Onboarding friction reducer." },
+            { id: 5, name: "Clay", city: "New York", state: "NY", industry: "SaaS", amount: 46, ceo: "Kareem Amin", email: "kareem@clay.com", sweOpen: true, pitch: "Tech stack signal scraper template.", rationale: "Expand use cases." },
+            { id: 14, name: "Ampla", city: "New York", state: "NY", industry: "Fintech", amount: 40, ceo: "Anthony Santomo", email: "anthony@getampla.com", sweOpen: false, pitch: "Inventory cash flow predictor.", rationale: "Financial utility." },
+            { id: 16, name: "Chronosphere", city: "New York", state: "NY", industry: "DevOps", amount: 200, ceo: "Martin Mao", email: "martin@chronosphere.io", sweOpen: true, pitch: "Metric cardinality auditor to save costs.", rationale: "Cost optimization tool." },
+            { id: 19, name: "Bilt Rewards", city: "New York", state: "NY", industry: "Fintech", amount: 150, ceo: "Ankur Jain", email: "ankur@biltrewards.com", sweOpen: false, pitch: "Neighborhood discovery map for points.", rationale: "Daily engagement." },
+            { id: 27, name: "Capital", city: "New York", state: "NY", industry: "Fintech", amount: 40, ceo: "Ryan Caldbeck", email: "ryan@capital.xyz", sweOpen: true, pitch: "Founder benchmark network.", rationale: "Community building." },
+            { id: 31, name: "Captions", city: "New York", state: "NY", industry: "AI / Media", amount: 60, ceo: "Gaurav Misra", email: "gaurav@captions.ai", sweOpen: true, pitch: "Trend jacker: Match templates to viral audio.", rationale: "Growth feature." },
+            { id: 34, name: "GlossGenius", city: "New York", state: "NY", industry: "SaaS", amount: 28, ceo: "Danielle Cohen-Shohet", email: "danielle@glossgenius.com", sweOpen: false, pitch: "Auto-generated portfolio websites.", rationale: "Ecosystem lock-in." },
+
+            // SEATTLE
+            { id: 10, name: "MotherDuck", city: "Seattle", state: "WA", industry: "Data", amount: 52, ceo: "Jordan Tigani", email: "jordan@motherduck.com", sweOpen: true, pitch: "WASM-based zero-latency dashboard demo.", rationale: "Show off speed." },
+            { id: 23, name: "Chainguard", city: "Seattle", state: "WA", industry: "Security", amount: 61, ceo: "Dan Lorenc", email: "dan@chainguard.dev", sweOpen: true, pitch: "Vulnerability impact graph.", rationale: "Prioritization tool." },
+            { id: 32, name: "Statsig", city: "Seattle", state: "WA", industry: "DevTools", amount: 43, ceo: "Vijaye Raji", email: "vijaye@statsig.com", sweOpen: true, pitch: "Experiment win-rate gamification.", rationale: "Culture building." },
+            
+            // CHICAGO & OTHERS
+            { id: 15, name: "Kin Insurance", city: "Chicago", state: "IL", industry: "Insurtech", amount: 82, ceo: "Sean Harper", email: "sean@kin.com", sweOpen: true, pitch: "Climate risk shield dashboard.", rationale: "Customer retention." },
+            { id: 40, name: "Project44", city: "Chicago", state: "IL", industry: "Logistics", amount: 202, ceo: "Jett McCandless", email: "jett@project44.com", sweOpen: true, pitch: "Delay impact calculator.", rationale: "ROI visualization." },
+            { id: 12, name: "Shield AI", city: "San Diego", state: "CA", industry: "Defense / AI", amount: 165, ceo: "Ryan Tseng", email: "ryan@shield.ai", sweOpen: true, pitch: "Simulation replay tool.", rationale: "Ops requirement." },
+            { id: 26, name: "Regard", city: "Los Angeles", state: "CA", industry: "Health / AI", amount: 30, ceo: "Eli Ben-Joseph", email: "eli@withregard.com", sweOpen: true, pitch: "Time-saved ticker for hospital admins.", rationale: "B2B sales tool." },
+            { id: 28, name: "Owner.com", city: "Palo Alto", state: "CA", industry: "SaaS", amount: 33, ceo: "Adam Guild", email: "adam@owner.com", sweOpen: true, pitch: "Mobile command center for GMs.", rationale: "Mobile-first UX." },
+            { id: 30, name: "Abridge", city: "Pittsburgh", state: "PA", industry: "Health / AI", amount: 150, ceo: "Shiv Rao", email: "shiv@abridge.com", sweOpen: true, pitch: "Patient recap view.", rationale: "Patient value." },
+            { id: 33, name: "KoBold Metals", city: "Berkeley", state: "CA", industry: "Climate / AI", amount: 195, ceo: "Kurt House", email: "kurt@koboldmetals.com", sweOpen: true, pitch: "Discovery timeline map.", rationale: "Investor relations." },
+            { id: 38, name: "Pearl", city: "Los Angeles", state: "CA", industry: "Health / AI", amount: 58, ceo: "Ophir Tanz", email: "ophir@hellopearl.com", sweOpen: true, pitch: "Interactive tooth map for patients.", rationale: "Sales aid." },
+
+            // BOSTON
+            { id: 101, name: "Overjet", city: "Boston", state: "MA", industry: "AI / Health", amount: 42, ceo: "Wardah Inam", email: "wardah@overjet.ai", sweOpen: true, pitch: "Claim acceptance predictor.", rationale: "Revenue impact." },
+            { id: 102, name: "LinkSquares", city: "Boston", state: "MA", industry: "Legal Tech", amount: 100, ceo: "Vishal Rajapaksha", email: "vishal@linksquares.com", sweOpen: true, pitch: "Clause library plugin for Word.", rationale: "Workflow stickiness." },
+            { id: 103, name: "Iterative Scopes", city: "Cambridge", state: "MA", industry: "AI / Health", amount: 150, ceo: "Jonathan Ng", email: "jonathan@iterativescopes.com", sweOpen: true, pitch: "Patient matcher dashboard.", rationale: "Clinical trial speed." },
+            { id: 104, name: "Flipside Crypto", city: "Boston", state: "MA", industry: "Crypto", amount: 50, ceo: "Dave Balter", email: "dave@flipsidecrypto.com", sweOpen: true, pitch: "Treasury health visualizer.", rationale: "Transparency." },
+            { id: 105, name: "Tines", city: "Boston", state: "MA", industry: "Security", amount: 55, ceo: "Eoin Hinchy", email: "eoin@tines.com", sweOpen: true, pitch: "Automation story library.", rationale: "Onboarding speed." },
+
+            // AUSTIN
+            { id: 201, name: "Jasper", city: "Austin", state: "TX", industry: "AI / Marketing", amount: 125, ceo: "Dave Rogenmoser", email: "dave@jasper.ai", sweOpen: true, pitch: "Brand voice consistency scorecard.", rationale: "Enterprise governance." },
+            { id: 202, name: "ICON", city: "Austin", state: "TX", industry: "Construction", amount: 185, ceo: "Jason Ballard", email: "jason@iconbuild.com", sweOpen: true, pitch: "Architectural configurator.", rationale: "Sales enablement." },
+            { id: 203, name: "Atmosphere", city: "Austin", state: "TX", industry: "Media", amount: 65, ceo: "Blake Sabatinelli", email: "blake@atmosphere.tv", sweOpen: false, pitch: "Foot traffic attribution report.", rationale: "Ad ROI." },
+            { id: 204, name: "Wheel", city: "Austin", state: "TX", industry: "Health Tech", amount: 150, ceo: "Michelle Davey", email: "michelle@wheel.com", sweOpen: true, pitch: "Clinician capacity heatmap.", rationale: "Operational transparency." },
+            { id: 205, name: "AlertMedia", city: "Austin", state: "TX", industry: "SaaS", amount: 60, ceo: "Christopher Kenessey", email: "christopher@alertmedia.com", sweOpen: false, pitch: "Predictive risk dashboard.", rationale: "Proactive safety." },
+
+            // DENVER
+            { id: 301, name: "SonderMind", city: "Denver", state: "CO", industry: "Health Tech", amount: 150, ceo: "Mark Frank", email: "mark@sondermind.com", sweOpen: false, pitch: "Wellness journey timeline.", rationale: "Patient retention." },
+            { id: 302, name: "Vareto", city: "Denver", state: "CO", industry: "Fintech", amount: 20, ceo: "Kat Orekhova", email: "kat@vareto.com", sweOpen: true, pitch: "Automated board deck generator.", rationale: "CFO workflow." }
         ];
 
-        // --- STATE MANAGEMENT ---
+        // --- APP LOGIC ---
         let state = {
-            data: [...startupData],
-            filterIndustry: 'All',
-            filterCity: 'All',
-            searchQuery: '',
-            sortField: 'amount',
-            sortOrder: 'desc'
+            data: companies,
+            sortField: 'sweOpen', // Sort by hiring status by default
+            sortOrder: 'desc',
+            filters: { city: 'All', industry: 'All', search: '', sweOnly: false }
         };
 
-        // --- INIT ---
-        document.addEventListener('DOMContentLoaded', () => {
-            populateDropdowns();
+        function init() {
+            populateFilters();
             renderCharts();
             renderTable();
+        }
 
-            // Inputs
-            document.getElementById('searchInput').addEventListener('input', (e) => {
-                state.searchQuery = e.target.value.toLowerCase();
-                filterData();
-            });
-            document.getElementById('industryFilter').addEventListener('change', (e) => {
-                state.filterIndustry = e.target.value;
-                filterData();
-            });
-            document.getElementById('cityFilter').addEventListener('change', (e) => {
-                state.filterCity = e.target.value;
-                filterData();
-            });
-        });
-
-        // --- CORE FUNCTIONS ---
-        function populateDropdowns() {
-            const industries = [...new Set(startupData.map(d => d.industry))].sort();
-            const cities = [...new Set(startupData.map(d => d.city))].sort();
+        function populateFilters() {
+            const cities = [...new Set(companies.map(c => c.city))].sort();
+            const industries = [...new Set(companies.map(c => c.industry))].sort();
             
-            industries.forEach(i => {
-                const opt = document.createElement('option');
-                opt.value = i; opt.textContent = i;
-                document.getElementById('industryFilter').appendChild(opt);
-            });
-            cities.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c; opt.textContent = c;
-                document.getElementById('cityFilter').appendChild(opt);
-            });
+            cities.forEach(c => document.getElementById('cityFilter').add(new Option(c, c)));
+            industries.forEach(i => document.getElementById('industryFilter').add(new Option(i, i)));
+            
+            document.getElementById('total-opportunities').innerText = `${companies.length} Companies`;
+        }
+
+        function toggleSweFilter() {
+            state.filters.sweOnly = !state.filters.sweOnly;
+            const btn = document.getElementById('sweToggle');
+            const ind = document.getElementById('sweIndicator');
+            
+            if (state.filters.sweOnly) {
+                btn.classList.add('bg-emerald-50', 'border-emerald-300', 'text-emerald-700', 'ring-2', 'ring-emerald-500/20');
+                ind.classList.remove('bg-slate-300');
+                ind.classList.add('bg-emerald-500', 'hiring-pulse');
+            } else {
+                btn.classList.remove('bg-emerald-50', 'border-emerald-300', 'text-emerald-700', 'ring-2', 'ring-emerald-500/20');
+                ind.classList.add('bg-slate-300');
+                ind.classList.remove('bg-emerald-500', 'hiring-pulse');
+            }
+            renderTable();
         }
 
         function filterData() {
-            state.data = startupData.filter(d => {
-                const search = state.searchQuery;
-                const matchText = d.name.toLowerCase().includes(search) || 
-                                  d.ceo.toLowerCase().includes(search) || 
-                                  d.industry.toLowerCase().includes(search);
-                const matchInd = state.filterIndustry === 'All' || d.industry === state.filterIndustry;
-                const matchCity = state.filterCity === 'All' || d.city === state.filterCity;
-                return matchText && matchInd && matchCity;
-            });
-            sortDataInternal();
-            renderTable();
-            document.getElementById('recordCount').innerText = `Showing ${state.data.length} companies`;
-        }
-
-        function sortTable(field) {
-            if (state.sortField === field) {
-                state.sortOrder = state.sortOrder === 'desc' ? 'asc' : 'desc';
-            } else {
-                state.sortField = field;
-                state.sortOrder = 'desc';
-            }
-            sortDataInternal();
-            renderTable();
-        }
-
-        function sortDataInternal() {
-            state.data.sort((a, b) => {
-                let va = a[state.sortField];
-                let vb = b[state.sortField];
-                if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); }
-                
-                if (va < vb) return state.sortOrder === 'asc' ? -1 : 1;
-                if (va > vb) return state.sortOrder === 'asc' ? 1 : -1;
+            return companies.filter(item => {
+                const matchSearch = (item.name + item.ceo + item.industry).toLowerCase().includes(state.filters.search);
+                const matchCity = state.filters.city === 'All' || item.city === state.filters.city;
+                const matchInd = state.filters.industry === 'All' || item.industry === state.filters.industry;
+                const matchSwe = !state.filters.sweOnly || item.sweOpen === true;
+                return matchSearch && matchCity && matchInd && matchSwe;
+            }).sort((a,b) => {
+                // Primary Sort: Selected field
+                const valA = a[state.sortField];
+                const valB = b[state.sortField];
+                if (valA < valB) return state.sortOrder === 'asc' ? -1 : 1;
+                if (valA > valB) return state.sortOrder === 'asc' ? 1 : -1;
                 return 0;
             });
         }
 
-        // --- RENDER TABLE ---
         function renderTable() {
             const tbody = document.getElementById('tableBody');
-            if (state.data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">No results found.</td></tr>`;
+            const data = filterData();
+            document.getElementById('filtered-count').innerText = `Showing ${data.length} companies`;
+
+            if(data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">No companies found matching current filters.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = state.data.map(item => `
-                <tr class="hover:bg-slate-50 transition-colors group">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <button onclick="openModal(${item.id})" class="bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-600 rounded-full w-8 h-8 flex items-center justify-center transition-all shadow-sm ring-1 ring-indigo-200">
-                            <i class="fas fa-key text-xs"></i>
+            tbody.innerHTML = data.map(item => `
+                <tr class="hover:bg-slate-50 transition-colors group border-l-4 border-transparent ${item.sweOpen ? 'hover:border-emerald-400' : 'hover:border-indigo-400'}">
+                    <td class="px-6 py-4">
+                        <button onclick="openModal(${item.id})" class="${item.sweOpen ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'} p-2 rounded-lg transition-all shadow-sm">
+                            <i class="fas fa-folder-open"></i>
                         </button>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="font-bold text-slate-900">${item.name}</div>
-                        <div class="text-xs text-slate-400">${item.industry}</div>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <div class="font-bold text-slate-900 text-base">${item.name}</div>
+                            ${item.sweOpen ? `
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-green-100 text-green-700 border border-green-200 shadow-sm hiring-pulse">
+                                SWE OPEN
+                            </span>` : ''}
+                        </div>
+                        <div class="text-xs text-slate-500 truncate max-w-[150px] mt-0.5">${item.industry}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-slate-700">${item.ceo}</div>
+                    <td class="px-6 py-4">
+                        ${item.sweOpen ? 
+                            `<div class="flex items-center gap-1.5 text-xs font-medium text-emerald-600">
+                                <i class="fas fa-check-circle"></i> High Probability
+                             </div>` : 
+                            `<div class="flex items-center gap-1.5 text-xs text-slate-400">
+                                <i class="fas fa-minus-circle"></i> Standard
+                             </div>`
+                        }
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            $${item.amount}M
-                        </span>
+                    <td class="px-6 py-4 font-mono text-sm text-slate-700">
+                        $${item.amount}M
                     </td>
-                    <td class="px-6 py-4 text-sm text-slate-500 max-w-xs truncate">
-                        ${item.rationale}
+                    <td class="px-6 py-4">
+                        <div class="text-sm font-medium text-slate-900">${item.ceo}</div>
                     </td>
-                    <td class="hidden lg:table-cell px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                        ${item.city}, ${item.state}
+                    <td class="px-6 py-4 text-xs text-slate-500 max-w-xs truncate">
+                        ${item.pitch}
                     </td>
                 </tr>
             `).join('');
         }
 
-        // --- MODAL LOGIC ---
-        function openModal(id) {
-            const item = startupData.find(d => d.id === id);
-            if (!item) return;
-
-            document.getElementById('modal-company-name').innerText = item.name;
-            document.getElementById('modal-company-desc').innerText = item.desc;
-            document.getElementById('modal-ceo-name').innerText = item.ceo;
-            document.getElementById('modal-ceo-email').innerText = item.email;
-            document.getElementById('modal-pitch').innerText = item.pitch;
-            document.getElementById('modal-rationale').innerText = item.rationale;
-            document.getElementById('modal-website').href = `https://www.google.com/search?q=${item.name}+startup`; // Fallback to search
-
-            const modal = document.getElementById('dossierModal');
-            modal.classList.remove('hidden');
-            // Small timeout to allow display:block to apply before adding opacity class
-            setTimeout(() => {
-                modal.querySelector('.bg-slate-900\\/75').classList.add('opacity-100');
-            }, 10);
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('dossierModal');
-            modal.querySelector('.bg-slate-900\\/75').classList.remove('opacity-100');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 200);
-        }
-
-        function copyToClipboard(elementId) {
-            const text = document.getElementById(elementId).innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                const toast = document.getElementById('toast');
-                toast.classList.remove('opacity-0', 'translate-y-20');
-                setTimeout(() => {
-                    toast.classList.add('opacity-0', 'translate-y-20');
-                }, 2000);
-            });
-        }
-
         // --- CHARTS ---
         function renderCharts() {
-            // Industry Chart
-            const inds = {};
-            startupData.forEach(d => { 
-                const k = d.industry.split(' / ')[0]; 
-                inds[k] = (inds[k] || 0) + d.amount; 
-            });
-            const topInds = Object.entries(inds).sort((a,b) => b[1]-a[1]).slice(0,5);
+            // Hub Chart
+            const hubs = {};
+            companies.filter(c => c.sweOpen).forEach(c => hubs[c.city] = (hubs[c.city]||0)+1);
+            const topHubs = Object.entries(hubs).sort((a,b)=>b[1]-a[1]).slice(0,5);
             
-            new Chart(document.getElementById('industryChart'), {
+            new Chart(document.getElementById('hubChart'), {
                 type: 'bar',
                 data: {
-                    labels: topInds.map(i => i[0]),
+                    labels: topHubs.map(h=>h[0]),
                     datasets: [{
-                        data: topInds.map(i => i[1]),
-                        backgroundColor: '#4f46e5', // Indigo 600
+                        label: 'Active SWE Roles',
+                        data: topHubs.map(h=>h[1]),
+                        backgroundColor: '#10b981',
                         borderRadius: 4
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                options: { 
+                    responsive: true, maintainAspectRatio: false, 
                     plugins: { legend: { display: false } },
-                    scales: { x: { grid: { display: false } }, y: { display: false } }
+                    scales: { x: { grid: { display: false } }, y: { display: false } } 
                 }
             });
 
-            // Location Chart
-            const locs = {};
-            startupData.forEach(d => { locs[d.city] = (locs[d.city] || 0) + 1; });
-            const topLocs = Object.entries(locs).sort((a,b) => b[1]-a[1]).slice(0,5);
+            // Stack/Industry Chart
+            const stacks = { 'AI/ML': 0, 'DevTools': 0, 'Fintech': 0, 'SaaS': 0, 'Other': 0 };
+            companies.filter(c => c.sweOpen).forEach(c => {
+                if(c.industry.includes('AI')) stacks['AI/ML']++;
+                else if(c.industry.includes('DevTools') || c.industry.includes('Data') || c.industry.includes('Security')) stacks['DevTools']++;
+                else if(c.industry.includes('Fintech') || c.industry.includes('Crypto')) stacks['Fintech']++;
+                else if(c.industry.includes('SaaS')) stacks['SaaS']++;
+                else stacks['Other']++;
+            });
 
-            new Chart(document.getElementById('locationChart'), {
+            new Chart(document.getElementById('stackChart'), {
                 type: 'doughnut',
                 data: {
-                    labels: topLocs.map(l => l[0]),
+                    labels: Object.keys(stacks),
                     datasets: [{
-                        data: topLocs.map(l => l[1]),
-                        backgroundColor: ['#0f172a', '#334155', '#475569', '#64748b', '#94a3b8'],
+                        data: Object.values(stacks),
+                        backgroundColor: ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#cbd5e1'],
                         borderWidth: 0
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: {size: 9} } } } }
             });
         }
+
+        // --- MODAL ---
+        function openModal(id) {
+            const item = companies.find(c => c.id === id);
+            document.getElementById('m-name').innerText = item.name;
+            document.getElementById('m-industry').innerText = item.industry;
+            document.getElementById('m-desc').innerText = `Recently raised $${item.amount}M Series B. Headquartered in ${item.city}, ${item.state}.`;
+            document.getElementById('m-ceo').innerText = item.ceo;
+            document.getElementById('m-email').innerText = item.email;
+            document.getElementById('m-pitch').innerText = item.pitch;
+            document.getElementById('m-rationale').innerText = item.rationale;
+            
+            // Dynamic badge in modal
+            const badge = document.getElementById('m-badge-container');
+            badge.innerHTML = item.sweOpen ? 
+                `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-green-500 text-white shadow-sm ml-2">ACTIVELY HIRING SWEs</span>` : '';
+
+            // Dynamic Careers Link
+            const q = encodeURIComponent(`${item.name} careers software engineer`);
+            document.getElementById('m-careers').href = `https://www.google.com/search?q=${q}`;
+
+            const modal = document.getElementById('modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.querySelector('.bg-slate-900\\/60').classList.add('opacity-100'), 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.querySelector('.bg-slate-900\\/60').classList.remove('opacity-100');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
+
+        function copyText(id) {
+            navigator.clipboard.writeText(document.getElementById(id).innerText).then(() => {
+                const toast = document.getElementById('toast');
+                toast.classList.remove('opacity-0', 'translate-y-24');
+                setTimeout(() => toast.classList.add('opacity-0', 'translate-y-24'), 2000);
+            });
+        }
+
+        // --- EVENTS ---
+        document.getElementById('searchInput').addEventListener('input', e => { state.filters.search = e.target.value.toLowerCase(); renderTable(); });
+        document.getElementById('cityFilter').addEventListener('change', e => { state.filters.city = e.target.value; renderTable(); });
+        document.getElementById('industryFilter').addEventListener('change', e => { state.filters.industry = e.target.value; renderTable(); });
+
+        function sortTable(field) {
+            if(state.sortField === field) state.sortOrder = state.sortOrder === 'desc' ? 'asc' : 'desc';
+            else { state.sortField = field; state.sortOrder = 'desc'; }
+            renderTable();
+        }
+
+        init();
     </script>
 </body>
 </html>
